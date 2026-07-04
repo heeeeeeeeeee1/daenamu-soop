@@ -1,7 +1,48 @@
+# ── 의존성 ──────────────────────────────
 node_modules/
+
+# ── 빌드 결과물 ─────────────────────────
 dist/
+build/
+
+# ── 환경변수 (민감 정보) ─────────────────
 .env
 .env.local
-.DS_Store
-*.log
+.env.*.local
+.env.production
+.env.development
+
+# ── SSL 인증서 (basicSsl 생성 파일) ──────
+*.pem
+*.key
+*.crt
+*.cert
+
+# ── TypeScript 증분 빌드 캐시 ────────────
+*.tsbuildinfo
+
+# ── 에디터 ──────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ── 배포 플랫폼 캐시 ─────────────────────
+.vercel/
+.output/
+.cache/
 .vite/
+
+# ── OS ──────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── 로그 ────────────────────────────────
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ── 테스트 커버리지 ──────────────────────
+coverage/
