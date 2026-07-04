@@ -18,11 +18,18 @@ const io = new Server(httpServer, {
     origin: '*',
     methods: ['GET', 'POST'],
   },
+  // 연결당 최대 버퍼 크기 제한
+  maxHttpBufferSize: 1e4,
 })
+
+// Rate limit: 소켓당 메시지 타임스탬프 추적
+const RATE_LIMIT   = 5   // 최대 메시지 수
+const RATE_WINDOW  = 10_000 // 10초
 
 io.on('connection', (socket) => {
   const nickname = generateNickname()
   socket.data.nickname = nickname as string
+  socket.data.msgTimestamps = [] as number[]
 
   socket.emit('nickname', nickname)
   io.emit('userCount', io.engine.clientsCount)
@@ -30,12 +37,22 @@ io.on('connection', (socket) => {
   socket.on('shout', ({ text, shoutId }: { text: string; shoutId?: string }) => {
     if (typeof text !== 'string' || text.trim().length === 0) return
 
+    // Rate limiting
+    const now = Date.now()
+    const timestamps: number[] = socket.data.msgTimestamps
+    const recent = timestamps.filter(t => now - t < RATE_WINDOW)
+    if (recent.length >= RATE_LIMIT) return  // 한도 초과 시 무시
+    socket.data.msgTimestamps = [...recent, now]
+
+    // 서버에서도 길이 제한 (클라이언트 bypass 방어)
+    const safeText = text.trim().slice(0, 300)
+    if (!safeText) return
+
     const msg = {
-      // 클라이언트가 보낸 ID를 그대로 사용해 중복 방지
       id:        shoutId ?? Math.random().toString(36).slice(2, 10),
       nickname:  socket.data.nickname as string,
-      text:      text.trim().slice(0, 300),
-      timestamp: Date.now(),
+      text:      safeText,
+      timestamp: now,
     }
     io.emit('message', msg)
   })
