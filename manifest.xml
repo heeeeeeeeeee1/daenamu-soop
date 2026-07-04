@@ -10,7 +10,7 @@
 
   [필요 조건]
   - Excel 365 또는 Excel 2016+
-  - 클라이언트 서버: cd client && npm run dev  (https://localhost:5173)
+  - 클라이언트 서버: cd client && npm run dev  (https://daenamu-soop.vercel.app)
   - 백엔드 서버: cd server && npm run dev      (http://localhost:3001)
 -->
 <OfficeApp
@@ -28,9 +28,9 @@
   <DisplayName DefaultValue="대나무숲 채팅" />
   <Description DefaultValue="업무 중 스트레스를 날려버리는 실시간 채팅. 욕을 입력하면 업무 메시지로 자동 변환됩니다." />
 
-  <IconUrl DefaultValue="https://localhost:5173/icons/icon48.png" />
-  <HighResolutionIconUrl DefaultValue="https://localhost:5173/icons/icon128.png" />
-  <SupportUrl DefaultValue="https://localhost:5173" />
+  <IconUrl DefaultValue="https://daenamu-soop.vercel.app/icons/icon48.png" />
+  <HighResolutionIconUrl DefaultValue="https://daenamu-soop.vercel.app/icons/icon128.png" />
+  <SupportUrl DefaultValue="https://daenamu-soop.vercel.app" />
 
   <AppDomains>
     <AppDomain>localhost</AppDomain>
@@ -41,7 +41,7 @@
   </Hosts>
 
   <DefaultSettings>
-    <SourceLocation DefaultValue="https://localhost:5173" />
+    <SourceLocation DefaultValue="https://daenamu-soop.vercel.app" />
   </DefaultSettings>
 
   <Permissions>ReadWriteDocument</Permissions>
@@ -90,13 +90,13 @@
 
     <Resources>
       <bt:Images>
-        <bt:Image id="Icon16"  DefaultValue="https://localhost:5173/icons/icon16.png" />
-        <bt:Image id="Icon32"  DefaultValue="https://localhost:5173/icons/icon48.png" />
-        <bt:Image id="Icon80"  DefaultValue="https://localhost:5173/icons/icon128.png" />
+        <bt:Image id="Icon16"  DefaultValue="https://daenamu-soop.vercel.app/icons/icon16.png" />
+        <bt:Image id="Icon32"  DefaultValue="https://daenamu-soop.vercel.app/icons/icon48.png" />
+        <bt:Image id="Icon80"  DefaultValue="https://daenamu-soop.vercel.app/icons/icon128.png" />
       </bt:Images>
       <bt:Urls>
-        <bt:Url id="Commands.Url"  DefaultValue="https://localhost:5173/commands.html" />
-        <bt:Url id="Taskpane.Url"  DefaultValue="https://localhost:5173" />
+        <bt:Url id="Commands.Url"  DefaultValue="https://daenamu-soop.vercel.app/commands.html" />
+        <bt:Url id="Taskpane.Url"  DefaultValue="https://daenamu-soop.vercel.app" />
       </bt:Urls>
       <bt:ShortStrings>
         <bt:String id="GroupLabel"             DefaultValue="업무 채팅" />
