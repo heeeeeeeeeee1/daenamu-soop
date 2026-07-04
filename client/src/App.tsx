@@ -390,10 +390,16 @@ function App() {
     socket.on('userCount',  (n: number)    => setUserCount(n))
     socket.on('message',    (msg: ChatMessage) => {
       setMessages(prev => prev.some(m => m.id === msg.id) ? prev : [...prev.slice(-200), msg])
+      if (document.hidden) {
+        document.title = '🔔 새 메시지 — 대나무숲'
+      }
     })
+    const onVisible = () => { if (!document.hidden) document.title = '대나무숲' }
+    document.addEventListener('visibilitychange', onVisible)
     return () => {
       socket.off('connect'); socket.off('disconnect')
       socket.off('nickname'); socket.off('userCount'); socket.off('message')
+      document.removeEventListener('visibilitychange', onVisible)
     }
   }, [])
 

@@ -17,6 +17,7 @@ const CURSE_PATTERNS = [
   /뒤져|뒤지/gi,
   /죽어|죽이/gi,
   /때려치|그만두|퇴사/gi,
+  /멍청이|멍청|바보|천치|얼간이|돌대가리|찐따|등신/gi,
   /\bf+u+c+k+/gi,
   /\bs+h+i+t+/gi,
   /\bb+i+t+c+h+/gi,
@@ -148,7 +149,7 @@ export function transform(raw: string): string {
   if (!trimmed) return ''
 
   const level = curseLevel(trimmed)
-  if (level === 0) return trimmed.endsWith('.') ? trimmed : trimmed + '.'
+  if (level === 0) return trimmed
 
   const tier = level <= 2 ? 0 : level <= 5 ? 1 : 2
   return pick(OFFICE[tier])

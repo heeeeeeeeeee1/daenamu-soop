@@ -15,7 +15,11 @@ const ShoutInput = forwardRef<HTMLInputElement, Props>(({ onShout }, ref) => {
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') { e.preventDefault(); submit() }
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      if (e.nativeEvent.isComposing) return  // Mac 한글 IME 이중입력 방지
+      submit()
+    }
     if (e.key === 'Escape') setText('')
   }
 
