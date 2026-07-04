@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  대나무숲 채팅 — Office Add-in Manifest
+
+  [사이드로드 방법]
+  1. Excel 열기
+  2. 삽입 탭 → Office 추가 기능 → 내 추가 기능 → 파일에서 업로드
+  3. 이 파일(manifest.xml) 선택
+  4. 홈 탭에 "업무 채팅" 그룹 → "대나무숲 열기" 버튼 클릭
+
+  [필요 조건]
+  - Excel 365 또는 Excel 2016+
+  - 클라이언트 서버: cd client && npm run dev  (https://localhost:5173)
+  - 백엔드 서버: cd server && npm run dev      (http://localhost:3001)
+-->
+<OfficeApp
+  xmlns="http://schemas.microsoft.com/office/appforoffice/1.1"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0"
+  xmlns:ov="http://schemas.microsoft.com/office/taskpaneappversionoverrides"
+  xsi:type="TaskPaneApp">
+
+  <Id>5f7a2b3c-4d1e-4f8a-9b0c-1d2e3f4a5b6c</Id>
+  <Version>1.0.0.0</Version>
+  <ProviderName>DaenamuSoop</ProviderName>
+  <DefaultLocale>ko-KR</DefaultLocale>
+
+  <DisplayName DefaultValue="대나무숲 채팅" />
+  <Description DefaultValue="업무 중 스트레스를 날려버리는 실시간 채팅. 욕을 입력하면 업무 메시지로 자동 변환됩니다." />
+
+  <IconUrl DefaultValue="https://localhost:5173/icons/icon48.png" />
+  <HighResolutionIconUrl DefaultValue="https://localhost:5173/icons/icon128.png" />
+  <SupportUrl DefaultValue="https://localhost:5173" />
+
+  <AppDomains>
+    <AppDomain>localhost</AppDomain>
+  </AppDomains>
+
+  <Hosts>
+    <Host Name="Workbook" />
+  </Hosts>
+
+  <DefaultSettings>
+    <SourceLocation DefaultValue="https://localhost:5173" />
+  </DefaultSettings>
+
+  <Permissions>ReadWriteDocument</Permissions>
+
+  <VersionOverrides
+    xmlns="http://schemas.microsoft.com/office/taskpaneappversionoverrides"
+    xsi:type="VersionOverridesV1_0">
+
+    <Hosts>
+      <Host xsi:type="Workbook">
+        <DesktopFormFactor>
+          <FunctionFile resid="Commands.Url" />
+
+          <ExtensionPoint xsi:type="PrimaryCommandSurface">
+            <OfficeTab id="TabHome">
+              <Group id="DaenamuSoopGroup">
+                <Label resid="GroupLabel" />
+                <Icon>
+                  <bt:Image size="16" resid="Icon16" />
+                  <bt:Image size="32" resid="Icon32" />
+                  <bt:Image size="80" resid="Icon80" />
+                </Icon>
+                <Control xsi:type="Button" id="OpenChatButton">
+                  <Label resid="OpenChatButton.Label" />
+                  <Supertip>
+                    <Title resid="OpenChatButton.Label" />
+                    <Description resid="OpenChatButton.Tooltip" />
+                  </Supertip>
+                  <Icon>
+                    <bt:Image size="16" resid="Icon16" />
+                    <bt:Image size="32" resid="Icon32" />
+                    <bt:Image size="80" resid="Icon80" />
+                  </Icon>
+                  <Action xsi:type="ShowTaskpane">
+                    <TaskpaneId>DaenamuTaskpane</TaskpaneId>
+                    <SourceLocation resid="Taskpane.Url" />
+                    <Title resid="OpenChatButton.Label" />
+                  </Action>
+                </Control>
+              </Group>
+            </OfficeTab>
+          </ExtensionPoint>
+        </DesktopFormFactor>
+      </Host>
+    </Hosts>
+
+    <Resources>
+      <bt:Images>
+        <bt:Image id="Icon16"  DefaultValue="https://localhost:5173/icons/icon16.png" />
+        <bt:Image id="Icon32"  DefaultValue="https://localhost:5173/icons/icon48.png" />
+        <bt:Image id="Icon80"  DefaultValue="https://localhost:5173/icons/icon128.png" />
+      </bt:Images>
+      <bt:Urls>
+        <bt:Url id="Commands.Url"  DefaultValue="https://localhost:5173/commands.html" />
+        <bt:Url id="Taskpane.Url"  DefaultValue="https://localhost:5173" />
+      </bt:Urls>
+      <bt:ShortStrings>
+        <bt:String id="GroupLabel"             DefaultValue="업무 채팅" />
+        <bt:String id="OpenChatButton.Label"   DefaultValue="대나무숲 열기" />
+      </bt:ShortStrings>
+      <bt:LongStrings>
+        <bt:String id="OpenChatButton.Tooltip" DefaultValue="업무 스트레스 해소 실시간 채팅 패널을 엽니다." />
+      </bt:LongStrings>
+    </Resources>
+  </VersionOverrides>
+</OfficeApp>

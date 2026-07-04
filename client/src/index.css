@@ -1,0 +1,657 @@
+/* ═══════════════════════════════════════
+   Excel 위장 테마 — 대나무숲
+   ═══════════════════════════════════════ */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --xl-green:       #217346;
+  --xl-green-dk:    #185c37;
+  --xl-green-lt:    #e2efda;
+  --xl-green-hi:    #70ad47;
+  --xl-ribbon:      #f3f3f3;
+  --xl-border:      #d0d0d0;
+  --xl-border-dk:   #b0b0b0;
+  --xl-cell:        #ffffff;
+  --xl-hdr:         #f3f3f3;
+  --xl-txt:         #000000;
+  --xl-txt-muted:   #555555;
+  --xl-sel:         #c6efce;
+  --xl-sel-border:  #70ad47;
+}
+
+html, body, #root {
+  width: 100vw; height: 100vh;
+  overflow: hidden;
+  background: #fff;
+  font-family: 'Segoe UI', 'Malgun Gothic', '맑은 고딕', sans-serif;
+  font-size: 12px;
+  color: var(--xl-txt);
+  cursor: default;
+  user-select: none;
+}
+
+/* ── 윈도우 쉘 ── */
+.xl-window {
+  width: 100vw; height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ── 타이틀바 ── */
+.xl-titlebar {
+  height: 30px;
+  background: var(--xl-green);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+.xl-titlebar-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 8px;
+  width: 220px;
+}
+.xl-app-icon { font-size: 14px; }
+.xl-qat { display: flex; gap: 2px; }
+.xl-qat-btn {
+  width: 24px; height: 22px;
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 11px;
+  cursor: pointer;
+  border-radius: 2px;
+  display: flex; align-items: center; justify-content: center;
+}
+.xl-qat-btn:hover { background: rgba(255,255,255,0.25); }
+
+.xl-title {
+  flex: 1;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.xl-titlebar-right {
+  display: flex;
+  width: 140px;
+  justify-content: flex-end;
+}
+.xl-winctr {
+  width: 46px; height: 30px;
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 11px;
+  cursor: pointer;
+}
+.xl-winctr:hover { background: rgba(255,255,255,0.2); }
+.xl-close:hover  { background: #c42b1c; }
+
+/* ── 리본 탭 ── */
+.xl-ribbon-tabs {
+  height: 26px;
+  background: var(--xl-green);
+  display: flex;
+  align-items: flex-end;
+  padding-left: 4px;
+  flex-shrink: 0;
+}
+.xl-rtab {
+  height: 22px;
+  padding: 0 12px;
+  font-size: 11px;
+  color: rgba(255,255,255,0.85);
+  display: flex; align-items: center;
+  cursor: pointer;
+  border-radius: 2px 2px 0 0;
+  transition: background 0.1s;
+}
+.xl-rtab:hover { background: rgba(255,255,255,0.15); }
+.xl-rtab.active {
+  background: var(--xl-ribbon);
+  color: var(--xl-green);
+  font-weight: 600;
+}
+.xl-rtab-filler { flex: 1; }
+.xl-sound-btn {
+  height: 20px;
+  margin: 0 8px 2px 0;
+  padding: 0 10px;
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 2px;
+  background: transparent;
+  color: rgba(255,255,255,0.85);
+  font-size: 11px;
+  cursor: pointer;
+}
+.xl-sound-btn:hover { background: rgba(255,255,255,0.15); }
+.xl-sound-btn.on    { background: rgba(255,255,255,0.25); color: #fff; }
+
+/* ── 리본 본문 ── */
+.xl-ribbon-body {
+  height: 68px;
+  background: var(--xl-ribbon);
+  border-bottom: 1px solid var(--xl-border-dk);
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 4px 4px 0;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.xl-rgroup {
+  display: flex;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 0 6px;
+  height: 100%;
+  flex-direction: row;
+  position: relative;
+  padding-bottom: 14px;
+}
+.xl-rgroup-label {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  text-align: center;
+  font-size: 9px;
+  color: var(--xl-txt-muted);
+  border-top: 1px solid var(--xl-border);
+  padding-top: 1px;
+}
+
+.xl-paste-big {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  cursor: pointer;
+  font-size: 20px;
+  gap: 1px;
+}
+.xl-paste-big span { font-size: 9px; color: var(--xl-txt-muted); }
+.xl-paste-big:hover { background: #e8e8e8; border-color: var(--xl-border); }
+
+.xl-rgroup-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.xl-rbtn {
+  height: 15px;
+  padding: 0 6px;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  background: transparent;
+  font-size: 10px;
+  cursor: pointer;
+  white-space: nowrap;
+  text-align: left;
+}
+.xl-rbtn:hover { background: #e8e8e8; border-color: var(--xl-border); }
+
+.xl-rfont-row {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  height: 22px;
+}
+.xl-rselect {
+  height: 20px;
+  border: 1px solid var(--xl-border);
+  border-radius: 2px;
+  font-size: 11px;
+  background: #fff;
+  padding: 0 4px;
+  outline: none;
+}
+.xl-ricobtn {
+  min-width: 22px;
+  height: 20px;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  background: transparent;
+  font-size: 11px;
+  cursor: pointer;
+  padding: 0 3px;
+  display: flex; align-items: center; justify-content: center;
+}
+.xl-ricobtn:hover { background: #e8e8e8; border-color: var(--xl-border); }
+.xl-bold      { font-weight: 900; }
+.xl-italic    { font-style: italic; }
+.xl-underline { text-decoration: underline; }
+
+.xl-rsep   { width: 1px; background: var(--xl-border); margin: 4px 4px 16px; align-self: stretch; }
+.xl-rsep-v { width: 1px; background: var(--xl-border); margin: 0 2px; align-self: stretch; }
+
+.xl-rbtn-tall {
+  height: 46px;
+  padding: 0 6px;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  background: transparent;
+  font-size: 10px;
+  cursor: pointer;
+  white-space: nowrap;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 2px;
+}
+.xl-rbtn-tall:hover { background: #e8e8e8; border-color: var(--xl-border); }
+.xl-delete-btn.active {
+  color: #c00;
+  background: #fff0f0;
+  border-color: #f4b8b8;
+}
+.xl-delete-btn.active:hover { background: #ffe0e0; }
+.xl-sel-hint { color: #5b9bd5; font-weight: 500; }
+
+/* ── 수식 입력줄 ── */
+.xl-formulabar {
+  height: 26px;
+  border-bottom: 1px solid var(--xl-border-dk);
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  background: #fff;
+}
+.xl-namebox {
+  width: 76px;
+  min-width: 76px;
+  padding: 0 6px;
+  font-size: 11px;
+  height: 100%;
+  display: flex; align-items: center;
+  border-right: 1px solid var(--xl-border-dk);
+  color: var(--xl-txt-muted);
+}
+.xl-fb-sep {
+  width: 1px;
+  height: 100%;
+  background: var(--xl-border-dk);
+}
+.xl-fx {
+  padding: 0 8px;
+  font-style: italic;
+  font-size: 13px;
+  color: var(--xl-txt-muted);
+  border-right: 1px solid var(--xl-border-dk);
+  height: 100%;
+  display: flex; align-items: center;
+}
+.xl-fbinput {
+  flex: 1;
+  height: 100%;
+  padding: 0 8px;
+  border: none;
+  outline: none;
+  font-size: 12px;
+  font-family: inherit;
+  background: #fff;
+  color: var(--xl-txt);
+  cursor: text;
+  user-select: text;
+}
+.xl-fbinput::placeholder { color: #b0b0b0; font-size: 11px; }
+.xl-fbinput:focus { background: #fffde7; }
+
+/* ── 시트 영역 ── */
+.xl-sheet {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* 열 헤더 */
+.xl-colheaders {
+  display: flex;
+  flex-shrink: 0;
+  height: 20px;
+  border-bottom: 1px solid var(--xl-border-dk);
+  background: var(--xl-hdr);
+}
+.xl-corner {
+  width: 40px; min-width: 40px;
+  border-right: 1px solid var(--xl-border);
+  background: var(--xl-hdr);
+}
+.xl-colhdr {
+  height: 100%;
+  border-right: 1px solid var(--xl-border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px;
+  color: var(--xl-txt-muted);
+}
+.xl-colflex { flex: 1; }
+
+/* 행 스크롤 컨테이너 */
+.xl-rows {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.xl-rows::-webkit-scrollbar { width: 14px; }
+.xl-rows::-webkit-scrollbar-thumb {
+  background: #c8c8c8;
+  border: 3px solid #f3f3f3;
+  border-radius: 7px;
+}
+.xl-rows::-webkit-scrollbar-track { background: #f3f3f3; }
+
+/* 행 */
+.xl-row {
+  display: flex;
+  min-height: 20px;
+  border-bottom: 1px solid #e8e8e8;
+}
+.xl-row:hover { background: #f5f5f5; }
+.xl-row-header {
+  background: var(--xl-green-lt) !important;
+  font-weight: 600;
+  position: sticky; top: 0; z-index: 2;
+  border-bottom: 2px solid var(--xl-green-hi) !important;
+  font-size: 11px;
+  color: var(--xl-green-dk);
+}
+.xl-row-mine { background: #f0faf0; }
+.xl-row-mine:hover { background: #e8f5e8; }
+
+/* 새 메시지 애니메이션 */
+.xl-row-new { animation: rowSlideIn 0.18s ease-out; }
+@keyframes rowSlideIn {
+  from { background-color: #c6efce; }
+  to   { background-color: transparent; }
+}
+.xl-row-mine.xl-row-new {
+  animation: rowSlideInMine 0.18s ease-out;
+}
+@keyframes rowSlideInMine {
+  from { background-color: #a9d18e; }
+  to   { background-color: #f0faf0; }
+}
+
+/* 선택된 행 */
+.xl-row-selected,
+.xl-row-selected:hover {
+  background: #cce8ff !important;
+  outline: 1px solid #5b9bd5;
+  outline-offset: -1px;
+}
+.xl-rownum-sel {
+  background: #5b9bd5 !important;
+  color: #fff !important;
+  font-size: 10px;
+}
+
+/* 행 번호 */
+.xl-rownum {
+  width: 40px; min-width: 40px;
+  border-right: 1px solid var(--xl-border);
+  background: var(--xl-hdr);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px;
+  color: var(--xl-txt-muted);
+  flex-shrink: 0;
+  cursor: pointer;
+}
+.xl-rownum:hover { background: #dce6f1; color: #1f497d; }
+
+/* 셀 */
+.xl-cell {
+  border-right: 1px solid #e8e8e8;
+  padding: 2px 6px;
+  display: flex; align-items: center;
+  font-size: 12px;
+  min-height: 20px;
+  overflow: hidden;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.xl-cellflex { flex: 1; overflow: hidden; }
+
+.xl-cell-date { color: var(--xl-txt-muted); font-size: 11px; }
+.xl-cell-nick { color: #1f497d; font-size: 11px; font-weight: 500; }
+.xl-cell-orig {
+  color: #999; font-size: 10px; font-style: italic;
+  overflow: hidden; text-overflow: ellipsis;
+}
+.xl-cell-time { color: #aaa; font-size: 10px; justify-content: center; }
+
+.xl-empty { color: #bbb; font-size: 11px; font-style: italic; justify-content: center; }
+
+/* ── 리본 추가 버튼 스타일 ── */
+.xl-rtab-file {
+  background: var(--xl-green-dk) !important;
+  color: #fff !important;
+  border-radius: 0;
+}
+.xl-rbtn-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  background: transparent;
+  font-size: 18px;
+  cursor: pointer;
+  gap: 1px;
+}
+.xl-rbtn-icon:hover { background: #e8e8e8; border-color: var(--xl-border); }
+.xl-rbtn-active {
+  background: #dce6f1 !important;
+  border-color: #5b9bd5 !important;
+  color: #1f497d;
+}
+.xl-rbtn-checked { color: var(--xl-green); font-weight: 600; }
+.xl-chklabel {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  cursor: pointer;
+  padding: 1px 0;
+}
+
+/* ── 시트별 추가 스타일 ── */
+.xl-row-stripe { background: #fafafa; }
+.xl-row-total {
+  background: var(--xl-green-lt) !important;
+  font-weight: 600;
+  border-top: 2px solid var(--xl-green-hi);
+}
+.xl-cell-num { justify-content: flex-end; font-variant-numeric: tabular-nums; }
+.xl-cell-total { color: var(--xl-green-dk); }
+.xl-cell-total-label { color: var(--xl-green-dk); font-weight: 700; }
+.xl-cell-wrap { white-space: normal; font-size: 11px; }
+.xl-mono-text { font-family: 'Consolas', 'Malgun Gothic', monospace; font-size: 10px; color: #555; }
+
+/* 퍼센트 바 */
+.xl-pct-bar {
+  position: relative;
+  width: 100%;
+  height: 14px;
+  background: #e8e8e8;
+  border-radius: 2px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+.xl-pct-fill {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  background: #5b9bd5;
+  border-radius: 2px;
+}
+.xl-pct-fill-green { background: var(--xl-green-hi); }
+.xl-pct-fill-red   { background: #c0392b; }
+.xl-pct-label {
+  position: relative;
+  font-size: 10px;
+  font-weight: 600;
+  color: #fff;
+  z-index: 1;
+  padding: 0 4px;
+  text-shadow: 0 0 3px rgba(0,0,0,0.4);
+}
+
+/* 배지 */
+.xl-badge {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 600;
+}
+.xl-badge-green { background: #e2efda; color: var(--xl-green-dk); }
+.xl-badge-blue  { background: #dce6f1; color: #1f497d; }
+.xl-badge-red   { background: #fce4e4; color: #c0392b; }
+
+/* ── 활성 셀 (Excel 파란 테두리) ── */
+.xl-cell-active {
+  outline: 2px solid #5b9bd5 !important;
+  outline-offset: -1px;
+  background: #eff8ff !important;
+  position: relative;
+  z-index: 1;
+}
+
+/* 활성 열 헤더 */
+.xl-colhdr-active {
+  background: #dce6f1 !important;
+  color: #1f497d !important;
+  font-weight: 600;
+}
+
+/* 활성 행 번호 (셀이 있는 행) */
+.xl-rownum-active {
+  background: #dce6f1 !important;
+  color: #1f497d !important;
+  font-weight: 600;
+}
+
+/* 헤더 행 번호 (코너 셀) */
+.xl-rownum-hdr {
+  cursor: default;
+  background: var(--xl-hdr);
+}
+
+/* 수식 입력줄 — 셀 값 표시 (읽기 전용) */
+.xl-fb-cellval {
+  flex: 1;
+  height: 100%;
+  padding: 0 8px;
+  font-size: 12px;
+  color: var(--xl-txt);
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: text;
+}
+.xl-fb-cellval:hover {
+  background: #f5f5f5;
+}
+
+/* ── 원문 마스킹 ── */
+.xl-mask {
+  display: inline-block;
+  color: #999;
+  letter-spacing: 1px;
+  cursor: pointer;
+  font-size: 11px;
+  user-select: none;
+}
+.xl-mask:hover { color: #666; }
+/* 공개 상태 */
+.xl-mask.xl-mask-on {
+  color: #c00;
+  font-style: italic;
+  font-size: 10px;
+  letter-spacing: 0;
+}
+
+/* ── 하단: 시트탭 + 상태표시줄 ── */
+.xl-bottom {
+  height: 22px;
+  border-top: 1px solid var(--xl-border-dk);
+  background: var(--xl-hdr);
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+.xl-sheettabs {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  gap: 1px;
+  padding-left: 4px;
+}
+.xl-stab {
+  height: 20px;
+  padding: 0 14px;
+  border: 1px solid transparent;
+  border-bottom: none;
+  background: #ddd;
+  font-size: 11px;
+  cursor: pointer;
+  border-radius: 2px 2px 0 0;
+}
+.xl-stab:hover  { background: #e8e8e8; border-color: var(--xl-border); }
+.xl-stab.active {
+  background: #fff;
+  border-color: var(--xl-border-dk);
+  color: var(--xl-green);
+  font-weight: 600;
+}
+.xl-stab-add {
+  width: 22px; height: 20px;
+  border: none; background: transparent;
+  font-size: 14px; cursor: pointer; color: #555;
+  display: flex; align-items: center; justify-content: center;
+}
+.xl-stab-add:hover { background: #e0e0e0; border-radius: 2px; }
+
+.xl-statusbar {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 12px;
+  gap: 14px;
+  font-size: 11px;
+  color: var(--xl-txt-muted);
+}
+.xl-ok  { color: var(--xl-green); }
+.xl-off { color: #999; }
+
+.xl-viewbtns { display: flex; gap: 2px; }
+.xl-viewbtn {
+  width: 20px; height: 16px;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  background: transparent;
+  font-size: 11px; cursor: pointer;
+}
+.xl-viewbtn:hover  { border-color: var(--xl-border); }
+.xl-viewbtn.active { border-color: var(--xl-border-dk); background: #e0e0e0; }
+
+.xl-zoom {
+  width: 80px;
+  height: 14px;
+  accent-color: var(--xl-green);
+  cursor: pointer;
+}
+.xl-zoomlabel { font-size: 11px; }
