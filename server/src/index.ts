@@ -34,17 +34,16 @@ io.on('connection', (socket) => {
   socket.emit('nickname', nickname)
   io.emit('userCount', io.engine.clientsCount)
 
-  socket.on('shout', ({ text, shoutId }: { text: string; shoutId?: string }) => {
+  socket.on('shout', ({ text, original, shoutId }: { text: string; original?: string; shoutId?: string }) => {
     if (typeof text !== 'string' || text.trim().length === 0) return
 
     // Rate limiting
     const now = Date.now()
     const timestamps: number[] = socket.data.msgTimestamps
     const recent = timestamps.filter(t => now - t < RATE_WINDOW)
-    if (recent.length >= RATE_LIMIT) return  // 한도 초과 시 무시
+    if (recent.length >= RATE_LIMIT) return
     socket.data.msgTimestamps = [...recent, now]
 
-    // 서버에서도 길이 제한 (클라이언트 bypass 방어)
     const safeText = text.trim().slice(0, 300)
     if (!safeText) return
 
@@ -52,6 +51,7 @@ io.on('connection', (socket) => {
       id:        shoutId ?? Math.random().toString(36).slice(2, 10),
       nickname:  socket.data.nickname as string,
       text:      safeText,
+      original:  typeof original === 'string' ? original.trim().slice(0, 300) : undefined,
       timestamp: now,
     }
     io.emit('message', msg)

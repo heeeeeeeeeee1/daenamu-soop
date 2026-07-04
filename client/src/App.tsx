@@ -15,6 +15,7 @@ type CellAddr  = { row: number; col: number }
 type Sheet     = 'main' | 'monthly' | 'team'
 type RibbonTab = 'home' | 'insert' | 'layout' | 'formula' | 'data' | 'review' | 'view'
 type SortMode  = 'time' | 'nick-asc' | 'nick-desc'
+export type ColWidths = { A: number; B: number; D: number; E: number }
 
 function cellName(c: CellAddr) { return `${COL_LETTERS[c.col]}${c.row}` }
 
@@ -378,7 +379,9 @@ function App() {
   const [activeTab, setActiveTab]     = useState<RibbonTab>('home')
   const [sortMode, setSortMode]       = useState<SortMode>('time')
   const [filterMine, setFilterMine]   = useState(false)
-  const inputRef = useRef<HTMLInputElement>(null)
+  const [colWidths, setColWidths]     = useState<ColWidths>({ A: 56, B: 110, D: 90, E: 60 })
+  const inputRef   = useRef<HTMLInputElement>(null)
+  const resizeRef  = useRef<{ col: keyof ColWidths; startX: number; startW: number } | null>(null)
 
   useEffect(() => {
     socket.on('connect',    () => setIsConnected(true))
@@ -444,7 +447,7 @@ function App() {
     setSelectedIds(new Set())
     setActiveCell(null)
     if (soundOn) playShout(intensity + 1)
-    socket.emit('shout', { text: transformed, shoutId: id })
+    socket.emit('shout', { text: transformed, original: raw, shoutId: id })
   }, [myNickname, soundOn])
 
   const handleSoundToggle = () => {
@@ -453,6 +456,28 @@ function App() {
   }
 
   const clearFocus = () => { setActiveCell(null); setSelectedIds(new Set()); inputRef.current?.focus() }
+
+  const startResize = useCallback((col: keyof ColWidths, startX: number) => {
+    resizeRef.current = { col, startX, startW: colWidths[col] }
+    document.body.style.cursor = 'col-resize'
+    document.body.style.userSelect = 'none'
+
+    const onMove = (e: MouseEvent) => {
+      if (!resizeRef.current) return
+      const delta = e.clientX - resizeRef.current.startX
+      const newW  = Math.max(40, resizeRef.current.startW + delta)
+      setColWidths(prev => ({ ...prev, [resizeRef.current!.col]: newW }))
+    }
+    const onUp = () => {
+      resizeRef.current = null
+      document.body.style.cursor = ''
+      document.body.style.userSelect = ''
+      window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('mouseup', onUp)
+    }
+    window.addEventListener('mousemove', onMove)
+    window.addEventListener('mouseup', onUp)
+  }, [colWidths])
   const switchSheet = (s: Sheet) => { setActiveSheet(s); setActiveCell(null); setSelectedIds(new Set()) }
 
   const activeRow  = displayMessages.length + 2
@@ -547,13 +572,25 @@ function App() {
         {activeSheet === 'main' && (
           <div className="xl-colheaders">
             <div className="xl-corner"/>
-            {['A','B','C','D','E'].map((ltr,ci) => (
-              <div
-                key={ltr}
-                className={['xl-colhdr', ci===2?'xl-colflex':'', activeCell?.col===ci?'xl-colhdr-active':''].join(' ')}
-                style={ci===2 ? undefined : {width:[56,110,0,90,60][ci]}}
-              >{ltr}</div>
-            ))}
+            {(['A','B','C','D','E'] as const).map((ltr, ci) => {
+              const colKey = ltr as keyof ColWidths
+              const w = ltr === 'C' ? undefined : colWidths[colKey]
+              return (
+                <div
+                  key={ltr}
+                  className={['xl-colhdr', ci===2?'xl-colflex':'', activeCell?.col===ci?'xl-colhdr-active':''].join(' ')}
+                  style={w !== undefined ? {width: w, position:'relative'} : {position:'relative'}}
+                >
+                  {ltr}
+                  {ltr !== 'C' && (
+                    <div
+                      className="xl-col-resize"
+                      onMouseDown={e => { e.preventDefault(); e.stopPropagation(); startResize(colKey, e.clientX) }}
+                    />
+                  )}
+                </div>
+              )
+            })}
           </div>
         )}
 
@@ -566,6 +603,7 @@ function App() {
             onToggleSelect={toggleSelect}
             activeCell={activeCell}
             onCellClick={handleCellClick}
+            colWidths={colWidths}
           />
         )}
         {activeSheet === 'monthly' && <MonthlySheet messages={messages} today={TODAY} />}

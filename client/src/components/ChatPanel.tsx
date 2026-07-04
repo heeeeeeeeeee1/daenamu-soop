@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
+import { ColWidths } from '../App'
 
 export interface ChatMessage {
   id: string
@@ -16,6 +17,7 @@ interface Props {
   onToggleSelect: (id: string, multi: boolean) => void
   activeCell: { row: number; col: number } | null
   onCellClick: (row: number, col: number) => void
+  colWidths: ColWidths
 }
 
 function formatTime(ts: number) {
@@ -24,21 +26,21 @@ function formatTime(ts: number) {
   })
 }
 
-const MaskedCell: React.FC<{ text: string }> = ({ text }) => {
+const MaskedCell: React.FC<{ text: string; mine?: boolean }> = ({ text, mine }) => {
   const [revealed, setRevealed] = useState(false)
   return (
     <span
-      className={`xl-mask ${revealed ? 'xl-mask-on' : ''}`}
+      className={`xl-mask ${revealed ? 'xl-mask-on' : ''} ${mine ? 'xl-mask-mine' : ''}`}
       onClick={e => { e.stopPropagation(); setRevealed(r => !r) }}
       title={revealed ? '클릭하여 숨기기' : '클릭하여 보기'}
     >
-      {revealed ? text : '*'.repeat(text.length)}
+      {revealed ? text : '*'.repeat(Math.min(text.length, 20))}
     </span>
   )
 }
 
 const ChatPanel: React.FC<Props> = ({
-  messages, myNickname, today, selectedIds, onToggleSelect, activeCell, onCellClick,
+  messages, myNickname, today, selectedIds, onToggleSelect, activeCell, onCellClick, colWidths,
 }) => {
   const rowsRef = useRef<HTMLDivElement>(null)
 
@@ -68,11 +70,11 @@ const ChatPanel: React.FC<Props> = ({
       {/* 행 1: 헤더 */}
       <div className="xl-row xl-row-header">
         <div className="xl-rownum xl-rownum-hdr" onClick={e => e.stopPropagation()} />
-        {cell(1, 0, '',             { width: 56 },  '날짜')}
-        {cell(1, 1, '',             { width: 110 }, '담당자')}
-        {cell(1, 2, 'xl-cellflex', undefined,        '업무 내용')}
-        {cell(1, 3, '',             { width: 90 },  '원문 (비고)')}
-        {cell(1, 4, '',             { width: 60 },  '시간')}
+        {cell(1, 0, '',             { width: colWidths.A }, '날짜')}
+        {cell(1, 1, '',             { width: colWidths.B }, '담당자')}
+        {cell(1, 2, 'xl-cellflex', undefined,               '업무 내용')}
+        {cell(1, 3, '',             { width: colWidths.D }, '원문 (비고)')}
+        {cell(1, 4, '',             { width: colWidths.E }, '시간')}
       </div>
 
       {messages.length === 0 && (
@@ -114,13 +116,13 @@ const ChatPanel: React.FC<Props> = ({
               {selected ? '▶' : rowNum}
             </div>
 
-            {cell(rowNum, 0, 'xl-cell-date', { width: 56 },  today)}
-            {cell(rowNum, 1, 'xl-cell-nick', { width: 110 }, msg.nickname)}
-            {cell(rowNum, 2, 'xl-cellflex',  undefined,       msg.text)}
-            {cell(rowNum, 3, 'xl-cell-orig', { width: 90 },
-              mine && msg.original ? <MaskedCell text={msg.original} /> : null
+            {cell(rowNum, 0, 'xl-cell-date', { width: colWidths.A }, today)}
+            {cell(rowNum, 1, 'xl-cell-nick', { width: colWidths.B }, msg.nickname)}
+            {cell(rowNum, 2, 'xl-cellflex',  undefined,               msg.text)}
+            {cell(rowNum, 3, 'xl-cell-orig', { width: colWidths.D },
+              msg.original ? <MaskedCell text={msg.original} mine={mine} /> : null
             )}
-            {cell(rowNum, 4, 'xl-cell-time', { width: 60 }, formatTime(msg.timestamp))}
+            {cell(rowNum, 4, 'xl-cell-time', { width: colWidths.E }, formatTime(msg.timestamp))}
           </div>
         )
       })}

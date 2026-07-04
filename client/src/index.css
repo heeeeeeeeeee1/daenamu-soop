@@ -582,6 +582,25 @@ html, body, #root {
   font-size: 10px;
   letter-spacing: 0;
 }
+/* 본인 메시지 원문 — 살짝 다른 색으로 구분 */
+.xl-mask.xl-mask-mine { color: #b08000; }
+.xl-mask.xl-mask-mine:hover { color: #886000; }
+
+/* ── 열 너비 조절 핸들 ── */
+.xl-col-resize {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 5px;
+  height: 100%;
+  cursor: col-resize;
+  z-index: 10;
+}
+.xl-col-resize:hover,
+.xl-col-resize:active {
+  background: #217346;
+  opacity: 0.5;
+}
 
 /* ── 하단: 시트탭 + 상태표시줄 ── */
 .xl-bottom {
