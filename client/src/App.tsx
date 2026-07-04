@@ -448,6 +448,9 @@ function App() {
     setActiveCell(null)
     if (soundOn) playShout(intensity + 1)
     socket.emit('shout', { text: transformed, original: raw, shoutId: id })
+    // GA 이벤트
+    const tier = intensity === 0 ? 'clean' : intensity <= 2 ? 'mild' : intensity <= 5 ? 'spicy' : 'nuclear'
+    window.gtag?.('event', 'shout', { curse_tier: tier, curse_count: intensity })
   }, [myNickname, soundOn])
 
   const handleSoundToggle = () => {
