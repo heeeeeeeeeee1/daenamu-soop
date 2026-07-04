@@ -6,7 +6,7 @@ import App from './App.tsx'
 
 Sentry.init({
   dsn: 'https://f75ba9010fb1e43ce55d6bbad82bf110@o4511499988959232.ingest.us.sentry.io/4511675770404864',
-  environment: import.meta.env.MODE,
+  environment: location.hostname === 'localhost' ? 'development' : 'production',
   tracesSampleRate: 0.2,
 })
 
