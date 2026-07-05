@@ -145,10 +145,11 @@ const ChatPanel: React.FC<Props> = ({
       {messages.length === 0 && (
         <div className="xl-row">
           <div className="xl-rownum">2</div>
-          <div className="xl-cell" style={{width:56}}/>
+          <div className="xl-cell" style={{ width: colWidths.A }}/>
+          <div className="xl-cell" style={{ width: colWidths.B }}/>
           <div className="xl-cell xl-empty xl-cellflex">— 데이터 없음 —</div>
-          <div className="xl-cell" style={{width:90}}/>
-          <div className="xl-cell" style={{width:60}}/>
+          <div className="xl-cell" style={{ width: colWidths.D }}/>
+          <div className="xl-cell" style={{ width: colWidths.E }}/>
         </div>
       )}
 

@@ -4,7 +4,7 @@
 
 ```bash
 cd server && npm test   # 단위 + 통합 테스트 18개
-cd client && npm test   # 단위 + 컴포넌트/통합 테스트 47개
+cd client && npm test   # 단위 + 컴포넌트/통합 테스트 48개
 ```
 
 두 패키지 모두 [Vitest](https://vitest.dev)를 사용한다. 클라이언트는 jsdom 환경 +
@@ -46,7 +46,7 @@ Testing Library로 컴포넌트를 렌더링/조작한다.
 | `lib/cellHelpers.test.ts` | 단위 | 셀 이름 변환, 헤더/데이터 행 텍스트, **원문(D열)이 항상 `(비공개)`로만 노출**(마스킹 우회 방지), 범위 밖 인덱스 처리 |
 | `components/OnboardingModal.test.tsx` | 컴포넌트 | 배경/본문 클릭 전파, 확인·닫기 버튼 |
 | `components/ShoutInput.test.tsx` | 컴포넌트 | Enter 제출, 공백 무시, trim, Escape, maxLength |
-| `components/ChatPanel.test.tsx` | 컴포넌트 | 행 렌더링, 원문 마스킹 토글(행별 독립성), 행 선택/Ctrl+선택, activeCell 하이라이트, 셀 클릭 콜백, **스크롤 위치에 따른 자동 스크롤 여부** |
+| `components/ChatPanel.test.tsx` | 컴포넌트 | 행 렌더링, 원문 마스킹 토글(행별 독립성), 행 선택/Ctrl+선택, activeCell 하이라이트, 셀 클릭 콜백, 스크롤 위치에 따른 자동 스크롤 여부, **빈 상태(데이터 없음) 행의 열 구조/너비가 colWidths를 반영하는지** |
 | `App.test.tsx` | 통합 (소켓 mock) | 최초 방문 시 온보딩 자동 표시, 이미 방문 시 미표시, 확인 시 닫힘+방문기록 저장, **🟢 아이콘으로 재열람**, 재열람이 방문기록을 건드리지 않음 |
 | `hooks/useColResize.test.ts` | 단위(훅) | 기본 열 너비, 오른쪽 경계 드래그 시 확장, 최소 40px 제한, **C/D 경계 드래그(반대 방향) 시 D열이 좁아지고 넓어짐**, mouseup 이후 이동 무시 |
 
@@ -82,6 +82,12 @@ Testing Library로 컴포넌트를 렌더링/조작한다.
    `scrollTop = scrollHeight`를 설정해, 과거 메시지를 읽으려 위로 스크롤해도 다른
    사람이 메시지를 보내는 순간 강제로 바닥으로 끌려 내려갔음 → 이미 바닥 근처
    (120px 이내)에 있을 때만 자동으로 따라가도록 수정.
+8. **메시지가 없을 때(빈 상태) 열 너비 조정이 반영되지 않고 B/C 구분선이 없음
+   (client, 사용자 리포트)** — "데이터 없음" 빈 행이 실제 열 개수(A,B,C,D,E)보다
+   하나 적은 4칸짜리 `<div>`로 하드코딩되어 있었음. B열에 해당하는 셀 자체가
+   없다 보니 B/C 사이 구분선이 안 보였고, 폭도 `colWidths` prop 대신 고정값
+   (56/90/60)을 써서 사용자가 A/B/D/E열 너비를 조절해도 빈 행에는 반영되지
+   않았음 → 헤더 행과 동일하게 5칸 구조로 맞추고 `colWidths`를 그대로 사용하도록 수정.
 
 ## 알려진 한계 (별도 조치 없이 리포트만)
 

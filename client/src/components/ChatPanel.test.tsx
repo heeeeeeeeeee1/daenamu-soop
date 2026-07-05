@@ -44,6 +44,20 @@ describe('ChatPanel', () => {
     expect(screen.getByText('— 데이터 없음 —')).toBeInTheDocument()
   })
 
+  it('메시지가 없는 빈 행도 헤더와 같은 5개 열(A~E) 구조를 유지하고, 현재 colWidths를 반영한다', () => {
+    const customWidths: ColWidths = { A: 70, B: 130, D: 100, E: 65 }
+    setup({ messages: [], colWidths: customWidths })
+
+    const emptyRow = screen.getByText('— 데이터 없음 —').closest('.xl-row')!
+    const cells = emptyRow.querySelectorAll(':scope > .xl-cell')
+    // A, B, C(빈 안내문구), D, E — 헤더 행과 동일하게 5칸이어야 B/C 구분선이 생긴다
+    expect(cells).toHaveLength(5)
+    expect((cells[0] as HTMLElement).style.width).toBe('70px')
+    expect((cells[1] as HTMLElement).style.width).toBe('130px')
+    expect((cells[3] as HTMLElement).style.width).toBe('100px')
+    expect((cells[4] as HTMLElement).style.width).toBe('65px')
+  })
+
   it('원문은 기본적으로 마스킹되어 있고, 클릭하면 토글로 보였다 숨겨진다', async () => {
     setup()
     const masked = screen.getByTitle('클릭하여 보기')
