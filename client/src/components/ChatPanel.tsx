@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { ColWidths } from '../App'
+import type { ColWidths } from '../types'
 
 export interface ChatMessage {
   id: string
