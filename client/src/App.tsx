@@ -606,7 +606,8 @@ function App() {
       </div>
 
       {/* ── 시트 영역 ── */}
-      <div className="xl-sheet" style={{ zoom: zoom / 100 }}>
+      <div className="xl-sheet">
+        <div className="xl-zoom-content" style={{ zoom: zoom / 100 }}>
         {activeSheet === 'main' && (
           <div className="xl-colheaders">
             <div className="xl-corner"/>
@@ -646,6 +647,7 @@ function App() {
         )}
         {activeSheet === 'monthly' && <MonthlySheet messages={messages} today={TODAY} />}
         {activeSheet === 'team'    && <TeamSheet />}
+        </div>
       </div>
 
       {/* ── 하단 ── */}

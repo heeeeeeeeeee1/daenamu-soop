@@ -306,9 +306,13 @@ html, body, #root {
 /* ── 시트 영역 ── */
 .xl-sheet {
   flex: 1;
+  overflow: auto;
+}
+.xl-zoom-content {
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  height: 100%;
+  transform-origin: top left;
 }
 
 /* 열 헤더 */
