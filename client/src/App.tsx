@@ -381,12 +381,25 @@ function App() {
   const [filterMine, setFilterMine]   = useState(false)
   const [colWidths, setColWidths]     = useState<ColWidths>({ A: 56, B: 110, D: 90, E: 60 })
   const [zoom, setZoom]               = useState(100)
+  const [showOnboarding, setShowOnboarding] = useState(() => !localStorage.getItem('daenamu_visited'))
+  const [wakeSeconds, setWakeSeconds] = useState(0)
   const inputRef   = useRef<HTMLInputElement>(null)
   const resizeRef  = useRef<{ col: keyof ColWidths; startX: number; startW: number } | null>(null)
 
   useEffect(() => {
-    socket.on('connect',    () => setIsConnected(true))
-    socket.on('disconnect', () => setIsConnected(false))
+    let wakeTimer: ReturnType<typeof setInterval> | null = null
+    socket.on('connect', () => {
+      setIsConnected(true)
+      setWakeSeconds(0)
+      if (wakeTimer) { clearInterval(wakeTimer); wakeTimer = null }
+    })
+    socket.on('disconnect', () => {
+      setIsConnected(false)
+      setWakeSeconds(0)
+      wakeTimer = setInterval(() => setWakeSeconds(s => s + 1), 1000)
+    })
+    // 첫 접속 시 연결 안 되면 타이머 시작
+    wakeTimer = setInterval(() => setWakeSeconds(s => s + 1), 1000)
     socket.on('nickname',   (nick: string) => setMyNickname(nick))
     socket.on('userCount',  (n: number)    => setUserCount(n))
     socket.on('message',    (msg: ChatMessage) => {
@@ -401,6 +414,7 @@ function App() {
       socket.off('connect'); socket.off('disconnect')
       socket.off('nickname'); socket.off('userCount'); socket.off('message')
       document.removeEventListener('visibilitychange', onVisible)
+      if (wakeTimer) clearInterval(wakeTimer)
     }
   }, [])
 
@@ -512,6 +526,12 @@ function App() {
     {label:'검토',           id:'review'},
     {label:'보기',           id:'view'},
   ]
+
+  const dismissOnboarding = () => {
+    localStorage.setItem('daenamu_visited', '1')
+    setShowOnboarding(false)
+    inputRef.current?.focus()
+  }
 
   return (
     <div className="xl-window" onClick={clearFocus}>
@@ -661,6 +681,51 @@ function App() {
           <span className="xl-zoomlabel">{zoom}%</span>
         </div>
       </div>
+
+      {/* ── 서버 웨이크업 배너 ── */}
+      {!isConnected && wakeSeconds >= 3 && (
+        <div className="xl-wakebanner">
+          <span className="xl-wake-spin">⏳</span>
+          <span>
+            {wakeSeconds < 10
+              ? '서버 연결 중...'
+              : wakeSeconds < 20
+              ? '서버가 자고 있었나봐요. 깨우는 중... (무료 서버의 애환)'
+              : `${wakeSeconds}초째 기다리는 중... 서버가 숙면 중입니다. 조금만요.`}
+          </span>
+        </div>
+      )}
+
+      {/* ── 온보딩 모달 ── */}
+      {showOnboarding && (
+        <div className="xl-modal-backdrop" onClick={dismissOnboarding}>
+          <div className="xl-modal" onClick={e => e.stopPropagation()}>
+            <div className="xl-modal-titlebar">
+              <span>📊 Microsoft Excel</span>
+              <button className="xl-modal-close" onClick={dismissOnboarding}>✕</button>
+            </div>
+            <div className="xl-modal-body">
+              <div className="xl-modal-icon">⚠️</div>
+              <div className="xl-modal-content">
+                <p className="xl-modal-title">업무 관련 중요 공지</p>
+                <p>이 문서는 <strong>대나무숲</strong>입니다.</p>
+                <p>회사에서 하고 싶은 말을 수식 입력줄에 입력하고 Enter를 누르면,<br/>AI가 <strong>정중한 업무 메시지</strong>로 순화해 드립니다.</p>
+                <p>욕설 강도에 따라 변환 수위가 달라집니다:</p>
+                <ul>
+                  <li>🟢 욕 1~2개 → "일정 확인 부탁드립니다."</li>
+                  <li>🟡 욕 3~5개 → "오늘 EOD까지 공유드리겠습니다."</li>
+                  <li>🔴 욕 6개↑ → "크로스펑셔널 협업 강화 방안을..."</li>
+                </ul>
+                <p className="xl-modal-tip">💡 같은 서버에 접속한 사람들과 실시간으로 공유됩니다.<br/>원문은 <strong>* 마스킹</strong> 처리되며, 클릭하면 볼 수 있습니다.</p>
+                <p className="xl-modal-sub">옆자리 팀장이 봐도 그냥 엑셀입니다. 아마도.</p>
+              </div>
+            </div>
+            <div className="xl-modal-footer">
+              <button className="xl-modal-btn" onClick={dismissOnboarding}>확인</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
