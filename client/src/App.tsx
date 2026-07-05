@@ -280,7 +280,7 @@ function App() {
             />
           )}
           {activeSheet === 'monthly' && <MonthlySheet messages={messages} today={TODAY} />}
-          {activeSheet === 'team'    && <TeamSheet />}
+          {activeSheet === 'team'    && <TeamSheet messages={messages} today={TODAY} />}
         </div>
       </div>
 

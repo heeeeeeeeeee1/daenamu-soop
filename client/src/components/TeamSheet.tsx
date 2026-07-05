@@ -1,27 +1,35 @@
-import React from 'react'
+import React, { useMemo } from 'react'
+import { ChatMessage } from './ChatPanel'
 
-interface KpiRow {
-  team: string
-  lead: string
-  goal: number
-  actual: number
-  unit: string
-  deadline: string
-  note: string
+interface Props {
+  messages: ChatMessage[]
+  today: string
 }
 
-const ROWS: KpiRow[] = [
-  { team: '영업 1팀', lead: '박팀장',   goal: 120, actual: 108, unit: '건',  deadline: '07/31', note: '월말 집중 공략 필요' },
-  { team: '영업 2팀', lead: '최팀장',   goal: 100, actual: 104, unit: '건',  deadline: '07/31', note: '목표 초과 달성 중' },
-  { team: '개발팀',   lead: '김팀장',   goal: 30,  actual: 27,  unit: '건',  deadline: '08/15', note: 'QA 일정 조율 중' },
-  { team: '마케팅팀', lead: '이팀장',   goal: 50,  actual: 43,  unit: '건',  deadline: '07/31', note: 'SNS 캠페인 진행 중' },
-  { team: '인사팀',   lead: '정팀장',   goal: 15,  actual: 15,  unit: '건',  deadline: '07/15', note: '완료' },
-  { team: 'CS팀',     lead: '한팀장',   goal: 200, actual: 187, unit: '건',  deadline: '07/31', note: '콜 처리율 93.5%' },
-  { team: '기획팀',   lead: '장팀장',   goal: 8,   actual: 6,   unit: '건',  deadline: '08/31', note: '보고서 작성 중' },
-]
+// server/src/nickname.ts의 명사 목록과 동일 (서버/클라이언트가 별도 패키지라 직접 import 불가).
+// 긴 명사부터 매칭해야 '영업사원'이 '사원'으로 잘못 잡히는 걸 막을 수 있다.
+const NICKNAME_NOUNS = [
+  '다람쥐', '대나무', '직장인', '사원', '인턴',
+  '팀장', '개발자', '디자이너', '기획자', '영업사원',
+  '경리', '비서', '과장', '대리', '주임',
+  '신입', '알바생', '차장', '부장보좌', '팀원',
+].sort((a, b) => b.length - a.length)
+
+// 명사별 가짜 "목표" 수치 — 실적(실제 채팅 데이터)과 대비시켜 달성률을 보여주기 위한 위장용 값
+const TEAM_GOALS: Record<string, number> = {
+  '다람쥐': 8, '대나무': 8, '직장인': 15, '사원': 12, '인턴': 6,
+  '팀장': 10, '개발자': 15, '디자이너': 12, '기획자': 12, '영업사원': 18,
+  '경리': 8, '비서': 8, '과장': 10, '대리': 12, '주임': 10,
+  '신입': 8, '알바생': 6, '차장': 8, '부장보좌': 6, '팀원': 12,
+}
+const DEFAULT_GOAL = 10
+
+function findNoun(nickname: string): string | null {
+  return NICKNAME_NOUNS.find(n => nickname.endsWith(n)) ?? null
+}
 
 function achieveRate(actual: number, goal: number) {
-  return Math.round((actual / goal) * 100)
+  return goal > 0 ? Math.round((actual / goal) * 100) : 0
 }
 
 function statusLabel(rate: number): { label: string; cls: string } {
@@ -30,9 +38,27 @@ function statusLabel(rate: number): { label: string; cls: string } {
   return               { label: '미달',       cls: 'xl-badge-red' }
 }
 
-const TeamSheet: React.FC = () => {
-  const totalGoal   = ROWS.reduce((s, r) => s + r.goal,   0)
-  const totalActual = ROWS.reduce((s, r) => s + r.actual, 0)
+const TeamSheet: React.FC<Props> = ({ messages, today }) => {
+  const summary = useMemo(() => {
+    const map: Record<string, { actual: number; last: string; byNick: Record<string, number> }> = {}
+    for (const m of messages) {
+      const noun = findNoun(m.nickname)
+      if (!noun) continue
+      const entry = map[noun] ?? (map[noun] = { actual: 0, last: '', byNick: {} })
+      entry.actual++
+      entry.last = m.text
+      entry.byNick[m.nickname] = (entry.byNick[m.nickname] ?? 0) + 1
+    }
+    return Object.entries(map)
+      .map(([noun, d]) => {
+        const lead = Object.entries(d.byNick).sort((a, b) => b[1] - a[1])[0]?.[0] ?? noun
+        return { noun, lead, actual: d.actual, last: d.last, goal: TEAM_GOALS[noun] ?? DEFAULT_GOAL }
+      })
+      .sort((a, b) => b.actual - a.actual)
+  }, [messages])
+
+  const totalGoal   = summary.reduce((s, r) => s + r.goal,   0)
+  const totalActual = summary.reduce((s, r) => s + r.actual, 0)
   const totalRate   = achieveRate(totalActual, totalGoal)
 
   return (
@@ -50,17 +76,24 @@ const TeamSheet: React.FC = () => {
         <div className="xl-cell" style={{width:80}}>상태</div>
       </div>
 
-      {ROWS.map((row, i) => {
+      {summary.length === 0 && (
+        <div className="xl-row">
+          <div className="xl-rownum">2</div>
+          <div className="xl-cell xl-empty xl-cellflex">— 데이터 없음 — 메시지를 입력하면 여기에 집계됩니다 —</div>
+        </div>
+      )}
+
+      {summary.map((row, i) => {
         const rate = achieveRate(row.actual, row.goal)
         const { label, cls } = statusLabel(rate)
         const barWidth = Math.min(100, rate)
         return (
-          <div key={row.team} className={`xl-row ${i % 2 === 0 ? 'xl-row-stripe' : ''}`}>
+          <div key={row.noun} className={`xl-row ${i % 2 === 0 ? 'xl-row-stripe' : ''}`}>
             <div className="xl-rownum">{i + 2}</div>
-            <div className="xl-cell xl-cell-nick" style={{width:100}}>{row.team}</div>
+            <div className="xl-cell xl-cell-nick" style={{width:100}}>{row.noun}</div>
             <div className="xl-cell" style={{width:90, color:'#555'}}>{row.lead}</div>
-            <div className="xl-cell xl-cell-num" style={{width:70}}>{row.goal.toLocaleString()}{row.unit}</div>
-            <div className="xl-cell xl-cell-num" style={{width:70}}>{row.actual.toLocaleString()}{row.unit}</div>
+            <div className="xl-cell xl-cell-num" style={{width:70}}>{row.goal.toLocaleString()}건</div>
+            <div className="xl-cell xl-cell-num" style={{width:70}}>{row.actual.toLocaleString()}건</div>
             <div className="xl-cell" style={{width:80}}>
               <div className="xl-pct-bar">
                 <div
@@ -70,8 +103,8 @@ const TeamSheet: React.FC = () => {
                 <span className="xl-pct-label">{rate}%</span>
               </div>
             </div>
-            <div className="xl-cell xl-cell-date" style={{width:80}}>{row.deadline}</div>
-            <div className="xl-cell xl-cellflex" style={{color:'#555', fontSize:11}}>{row.note}</div>
+            <div className="xl-cell xl-cell-date" style={{width:80}}>{today}</div>
+            <div className="xl-cell xl-cellflex xl-cell-wrap" style={{color:'#555', fontSize:11}}>{row.last.slice(0, 60)}</div>
             <div className="xl-cell" style={{width:80}}>
               <span className={`xl-badge ${cls}`}>{label}</span>
             </div>
@@ -80,22 +113,24 @@ const TeamSheet: React.FC = () => {
       })}
 
       {/* 합계 */}
-      <div className="xl-row xl-row-total">
-        <div className="xl-rownum">{ROWS.length + 2}</div>
-        <div className="xl-cell xl-cell-total-label" style={{width:100}}>전체 합계</div>
-        <div className="xl-cell" style={{width:90}}/>
-        <div className="xl-cell xl-cell-num xl-cell-total" style={{width:70}}>{totalGoal.toLocaleString()}건</div>
-        <div className="xl-cell xl-cell-num xl-cell-total" style={{width:70}}>{totalActual.toLocaleString()}건</div>
-        <div className="xl-cell" style={{width:80}}>
-          <div className="xl-pct-bar">
-            <div className="xl-pct-fill" style={{width: `${Math.min(100,totalRate)}%`}} />
-            <span className="xl-pct-label">{totalRate}%</span>
+      {summary.length > 0 && (
+        <div className="xl-row xl-row-total">
+          <div className="xl-rownum">{summary.length + 2}</div>
+          <div className="xl-cell xl-cell-total-label" style={{width:100}}>전체 합계</div>
+          <div className="xl-cell" style={{width:90}}/>
+          <div className="xl-cell xl-cell-num xl-cell-total" style={{width:70}}>{totalGoal.toLocaleString()}건</div>
+          <div className="xl-cell xl-cell-num xl-cell-total" style={{width:70}}>{totalActual.toLocaleString()}건</div>
+          <div className="xl-cell" style={{width:80}}>
+            <div className="xl-pct-bar">
+              <div className="xl-pct-fill" style={{width: `${Math.min(100,totalRate)}%`}} />
+              <span className="xl-pct-label">{totalRate}%</span>
+            </div>
           </div>
+          <div className="xl-cell" style={{width:80}}/>
+          <div className="xl-cell xl-cellflex"/>
+          <div className="xl-cell" style={{width:80}}/>
         </div>
-        <div className="xl-cell" style={{width:80}}/>
-        <div className="xl-cell xl-cellflex"/>
-        <div className="xl-cell" style={{width:80}}/>
-      </div>
+      )}
     </div>
   )
 }
