@@ -32,7 +32,7 @@ io.on('connection', (socket) => {
   socket.data.msgTimestamps = [] as number[]
 
   socket.emit('nickname', nickname)
-  io.emit('userCount', io.engine.clientsCount)
+  io.emit('userCount', io.sockets.size)
 
   socket.on('shout', ({ text, original, shoutId }: { text: string; original?: string; shoutId?: string }) => {
     if (typeof text !== 'string' || text.trim().length === 0) return
@@ -58,7 +58,7 @@ io.on('connection', (socket) => {
   })
 
   socket.on('disconnect', () => {
-    io.emit('userCount', io.engine.clientsCount)
+    io.emit('userCount', io.sockets.size)
   })
 })
 

@@ -380,6 +380,7 @@ function App() {
   const [sortMode, setSortMode]       = useState<SortMode>('time')
   const [filterMine, setFilterMine]   = useState(false)
   const [colWidths, setColWidths]     = useState<ColWidths>({ A: 56, B: 110, D: 90, E: 60 })
+  const [zoom, setZoom]               = useState(100)
   const inputRef   = useRef<HTMLInputElement>(null)
   const resizeRef  = useRef<{ col: keyof ColWidths; startX: number; startW: number } | null>(null)
 
@@ -577,7 +578,7 @@ function App() {
       </div>
 
       {/* ── 시트 영역 ── */}
-      <div className="xl-sheet">
+      <div className="xl-sheet" style={{ fontSize: `${zoom}%` }}>
         {activeSheet === 'main' && (
           <div className="xl-colheaders">
             <div className="xl-corner"/>
@@ -655,8 +656,9 @@ function App() {
             <button className="xl-viewbtn active">▦</button>
             <button className="xl-viewbtn">📄</button>
           </div>
-          <input type="range" className="xl-zoom" min={60} max={200} defaultValue={100} title="확대/축소"/>
-          <span className="xl-zoomlabel">100%</span>
+          <input type="range" className="xl-zoom" min={60} max={200} value={zoom}
+            onChange={e => setZoom(Number(e.target.value))} title="확대/축소"/>
+          <span className="xl-zoomlabel">{zoom}%</span>
         </div>
       </div>
     </div>

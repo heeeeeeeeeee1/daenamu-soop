@@ -674,3 +674,49 @@ html, body, #root {
   cursor: pointer;
 }
 .xl-zoomlabel { font-size: 11px; }
+
+/* ── 모바일 반응형 (768px 이하) ── */
+@media (max-width: 768px) {
+  /* 타이틀바 간소화 */
+  .xl-titlebar { height: 32px; }
+  .xl-titlebar-left { gap: 4px; }
+  .xl-qat { display: none; }
+  .xl-title { font-size: 11px; }
+  .xl-winctr { display: none; }
+
+  /* 리본 완전 숨김 */
+  .xl-ribbon-tabs { display: none; }
+  .xl-ribbon-body { display: none; }
+
+  /* 수식 입력줄 — 입력창만 크게 */
+  .xl-formulabar { height: 36px; padding: 0 8px; }
+  .xl-namebox { display: none; }
+  .xl-fb-sep { display: none; }
+  .xl-fx { display: none; }
+  .xl-fbinput {
+    font-size: 14px !important;
+    height: 28px;
+    flex: 1;
+  }
+
+  /* 열 헤더 축소 */
+  .xl-colhdr { font-size: 10px; }
+  .xl-col-resize { display: none; }
+
+  /* 시트 가로 스크롤 허용 */
+  .xl-sheet { overflow-x: auto; }
+  .xl-rows { min-width: 480px; }
+
+  /* 행 셀 크기 조정 */
+  .xl-cell { font-size: 11px; padding: 2px 4px; }
+  .xl-rownum { width: 28px; font-size: 10px; }
+
+  /* 하단 상태바 간소화 */
+  .xl-statusbar { gap: 8px; padding: 0 6px; font-size: 10px; }
+  .xl-zoom { width: 60px; }
+  .xl-sel-hint { display: none; }
+  .xl-viewbtns { display: none; }
+
+  /* 시트탭 */
+  .xl-stab { font-size: 10px; padding: 0 8px; }
+}
