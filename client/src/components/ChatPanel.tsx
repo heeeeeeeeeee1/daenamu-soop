@@ -39,6 +39,65 @@ const MaskedCell: React.FC<{ text: string; mine?: boolean }> = ({ text, mine }) 
   )
 }
 
+interface RowProps {
+  msg: ChatMessage
+  mine: boolean
+  selected: boolean
+  rowNum: number
+  activeCol: number | null
+  today: string
+  colWidths: ColWidths
+  onToggleSelect: (id: string, multi: boolean) => void
+  onCellClick: (row: number, col: number) => void
+}
+
+const Row: React.FC<RowProps> = React.memo(({
+  msg, mine, selected, rowNum, activeCol, today, colWidths, onToggleSelect, onCellClick,
+}) => {
+  const cell = (col: number, className: string, style: React.CSSProperties | undefined, content: React.ReactNode) => (
+    <div
+      className={`xl-cell ${className} ${activeCol === col ? 'xl-cell-active' : ''}`}
+      style={style}
+      onClick={e => { e.stopPropagation(); onCellClick(rowNum, col) }}
+    >
+      {content}
+    </div>
+  )
+
+  return (
+    <div
+      className={[
+        'xl-row',
+        mine     ? 'xl-row-mine' : '',
+        selected ? 'xl-row-selected' : '',
+        'xl-row-new',
+      ].join(' ')}
+    >
+      {/* 행 번호 — 클릭으로 행 선택 */}
+      <div
+        className={[
+          'xl-rownum',
+          selected ? 'xl-rownum-sel' : '',
+          activeCol !== null && !selected ? 'xl-rownum-active' : '',
+        ].join(' ')}
+        onClick={e => { e.stopPropagation(); onToggleSelect(msg.id, e.ctrlKey || e.metaKey) }}
+        title="클릭: 행 선택 (Delete로 삭제)"
+      >
+        {selected ? '▶' : rowNum}
+      </div>
+
+      {cell(0, 'xl-cell-date', { width: colWidths.A }, today)}
+      {cell(1, 'xl-cell-nick', { width: colWidths.B }, msg.nickname)}
+      {cell(2, 'xl-cellflex',  undefined,               msg.text)}
+      {cell(3, 'xl-cell-orig', { width: colWidths.D },
+        msg.original ? <MaskedCell text={msg.original} mine={mine} /> : null
+      )}
+      {cell(4, 'xl-cell-time', { width: colWidths.E }, formatTime(msg.timestamp))}
+    </div>
+  )
+})
+Row.displayName = 'Row'
+
 const ChatPanel: React.FC<Props> = ({
   messages, myNickname, today, selectedIds, onToggleSelect, activeCell, onCellClick, colWidths,
 }) => {
@@ -88,42 +147,20 @@ const ChatPanel: React.FC<Props> = ({
       )}
 
       {messages.map((msg, i) => {
-        const mine     = isMine(msg)
-        const selected = selectedIds.has(msg.id)
-        const rowNum   = i + 2
-        const rowActive = activeCell?.row === rowNum
-
+        const rowNum = i + 2
         return (
-          <div
+          <Row
             key={msg.id}
-            className={[
-              'xl-row',
-              mine     ? 'xl-row-mine' : '',
-              selected ? 'xl-row-selected' : '',
-              'xl-row-new',
-            ].join(' ')}
-          >
-            {/* 행 번호 — 클릭으로 행 선택 */}
-            <div
-              className={[
-                'xl-rownum',
-                selected  ? 'xl-rownum-sel' : '',
-                rowActive && !selected ? 'xl-rownum-active' : '',
-              ].join(' ')}
-              onClick={e => { e.stopPropagation(); onToggleSelect(msg.id, e.ctrlKey || e.metaKey) }}
-              title="클릭: 행 선택 (Delete로 삭제)"
-            >
-              {selected ? '▶' : rowNum}
-            </div>
-
-            {cell(rowNum, 0, 'xl-cell-date', { width: colWidths.A }, today)}
-            {cell(rowNum, 1, 'xl-cell-nick', { width: colWidths.B }, msg.nickname)}
-            {cell(rowNum, 2, 'xl-cellflex',  undefined,               msg.text)}
-            {cell(rowNum, 3, 'xl-cell-orig', { width: colWidths.D },
-              msg.original ? <MaskedCell text={msg.original} mine={mine} /> : null
-            )}
-            {cell(rowNum, 4, 'xl-cell-time', { width: colWidths.E }, formatTime(msg.timestamp))}
-          </div>
+            msg={msg}
+            mine={isMine(msg)}
+            selected={selectedIds.has(msg.id)}
+            rowNum={rowNum}
+            activeCol={activeCell?.row === rowNum ? activeCell.col : null}
+            today={today}
+            colWidths={colWidths}
+            onToggleSelect={onToggleSelect}
+            onCellClick={onCellClick}
+          />
         )
       })}
     </div>

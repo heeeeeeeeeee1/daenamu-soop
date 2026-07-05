@@ -167,7 +167,11 @@ function App() {
       {/* 타이틀바 */}
       <div className="xl-titlebar">
         <div className="xl-titlebar-left">
-          <span className="xl-app-icon">🟢</span>
+          <span
+            className="xl-app-icon"
+            title="온보딩 다시보기"
+            onClick={e => { e.stopPropagation(); setShowOnboarding(true) }}
+          >🟢</span>
           <div className="xl-qat">
             <button className="xl-qat-btn" title="저장">💾</button>
             <button className="xl-qat-btn" title="실행취소">↩</button>

@@ -90,6 +90,7 @@ npm run dev        # https://localhost:5173
 | Build Command | `npm install` |
 | Start Command | `npm start` |
 | Instance Type | Free |
+| 환경변수 `CLIENT_ORIGIN` (선택) | 허용할 클라이언트 origin, 콤마로 여러 개 지정 (기본값: Vercel 배포 주소 + localhost:5173) |
 
 ### Vercel (클라이언트)
 
