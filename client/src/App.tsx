@@ -408,6 +408,14 @@ function App() {
         document.title = '🔔 새 메시지 — 대나무숲'
       }
     })
+    // 소켓이 이미 연결된 상태라면 리스너 등록 전에 이벤트를 놓쳤을 수 있으므로 직접 요청
+    if (socket.connected) {
+      setIsConnected(true)
+      setWakeSeconds(0)
+      if (wakeTimer) { clearInterval(wakeTimer); wakeTimer = null }
+      socket.emit('getCount')
+    }
+
     const onVisible = () => { if (!document.hidden) document.title = '대나무숲' }
     document.addEventListener('visibilitychange', onVisible)
     return () => {
