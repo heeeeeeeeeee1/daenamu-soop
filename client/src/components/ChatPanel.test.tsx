@@ -96,4 +96,47 @@ describe('ChatPanel', () => {
     await userEvent.click(screen.getByText('검토 후 말씀드리겠습니다.')) // m2 -> rowNum 3, col 2
     expect(onCellClick).toHaveBeenCalledWith(3, 2)
   })
+
+  it('위로 스크롤해 둔 상태에서 새 메시지가 오면 강제로 맨 아래로 내리지 않는다', () => {
+    const { container, rerender } = setup()
+    const rowsEl = container.querySelector('.xl-rows') as HTMLDivElement
+
+    // jsdom은 실제 레이아웃을 계산하지 않으므로 스크롤 상태를 직접 흉내낸다.
+    Object.defineProperty(rowsEl, 'scrollHeight', { value: 1000, configurable: true })
+    Object.defineProperty(rowsEl, 'clientHeight', { value: 300, configurable: true })
+    Object.defineProperty(rowsEl, 'scrollTop', { value: 50, writable: true, configurable: true }) // 맨 위 근처
+
+    const withNewMsg: ChatMessage[] = [
+      ...baseMsgs,
+      { id: 'm3', nickname: '새사람', text: '새 메시지 도착', timestamp: Date.now() },
+    ]
+    rerender(<ChatPanel
+      messages={withNewMsg} myNickname="성난다람쥐" today="07/05"
+      selectedIds={new Set()} onToggleSelect={vi.fn()} activeCell={null}
+      onCellClick={vi.fn()} colWidths={colWidths}
+    />)
+
+    expect(rowsEl.scrollTop).toBe(50) // 그대로 유지되어야 함 (강제 스크롤 없음)
+  })
+
+  it('바닥 근처에 있었다면 새 메시지가 오면 맨 아래로 따라간다', () => {
+    const { container, rerender } = setup()
+    const rowsEl = container.querySelector('.xl-rows') as HTMLDivElement
+
+    Object.defineProperty(rowsEl, 'scrollHeight', { value: 1000, configurable: true })
+    Object.defineProperty(rowsEl, 'clientHeight', { value: 300, configurable: true })
+    Object.defineProperty(rowsEl, 'scrollTop', { value: 690, writable: true, configurable: true }) // 바닥과 10px 차이
+
+    const withNewMsg: ChatMessage[] = [
+      ...baseMsgs,
+      { id: 'm3', nickname: '새사람', text: '새 메시지 도착', timestamp: Date.now() },
+    ]
+    rerender(<ChatPanel
+      messages={withNewMsg} myNickname="성난다람쥐" today="07/05"
+      selectedIds={new Set()} onToggleSelect={vi.fn()} activeCell={null}
+      onCellClick={vi.fn()} colWidths={colWidths}
+    />)
+
+    expect(rowsEl.scrollTop).toBe(1000) // scrollHeight까지 따라 내려가야 함
+  })
 })

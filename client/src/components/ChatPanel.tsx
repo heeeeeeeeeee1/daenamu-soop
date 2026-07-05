@@ -105,7 +105,13 @@ const ChatPanel: React.FC<Props> = ({
 
   useEffect(() => {
     const el = rowsRef.current
-    if (el) el.scrollTop = el.scrollHeight
+    if (!el) return
+    // 사용자가 과거 메시지를 읽으려고 위로 스크롤해 둔 상태라면, 새 메시지가
+    // 도착해도 강제로 맨 아래로 끌어내리지 않는다 (이미 바닥 근처일 때만 따라감).
+    const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight
+    if (distanceFromBottom < 120) {
+      el.scrollTop = el.scrollHeight
+    }
   }, [messages])
 
   const isMine = (msg: ChatMessage) => msg.nickname === myNickname || msg.nickname === '나'

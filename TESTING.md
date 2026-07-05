@@ -4,7 +4,7 @@
 
 ```bash
 cd server && npm test   # 단위 + 통합 테스트 18개
-cd client && npm test   # 단위 + 컴포넌트/통합 테스트 39개
+cd client && npm test   # 단위 + 컴포넌트/통합 테스트 47개
 ```
 
 두 패키지 모두 [Vitest](https://vitest.dev)를 사용한다. 클라이언트는 jsdom 환경 +
@@ -46,8 +46,9 @@ Testing Library로 컴포넌트를 렌더링/조작한다.
 | `lib/cellHelpers.test.ts` | 단위 | 셀 이름 변환, 헤더/데이터 행 텍스트, **원문(D열)이 항상 `(비공개)`로만 노출**(마스킹 우회 방지), 범위 밖 인덱스 처리 |
 | `components/OnboardingModal.test.tsx` | 컴포넌트 | 배경/본문 클릭 전파, 확인·닫기 버튼 |
 | `components/ShoutInput.test.tsx` | 컴포넌트 | Enter 제출, 공백 무시, trim, Escape, maxLength |
-| `components/ChatPanel.test.tsx` | 컴포넌트 | 행 렌더링, 원문 마스킹 토글(행별 독립성), 행 선택/Ctrl+선택, activeCell 하이라이트, 셀 클릭 콜백 |
+| `components/ChatPanel.test.tsx` | 컴포넌트 | 행 렌더링, 원문 마스킹 토글(행별 독립성), 행 선택/Ctrl+선택, activeCell 하이라이트, 셀 클릭 콜백, **스크롤 위치에 따른 자동 스크롤 여부** |
 | `App.test.tsx` | 통합 (소켓 mock) | 최초 방문 시 온보딩 자동 표시, 이미 방문 시 미표시, 확인 시 닫힘+방문기록 저장, **🟢 아이콘으로 재열람**, 재열람이 방문기록을 건드리지 않음 |
+| `hooks/useColResize.test.ts` | 단위(훅) | 기본 열 너비, 오른쪽 경계 드래그 시 확장, 최소 40px 제한, **C/D 경계 드래그(반대 방향) 시 D열이 좁아지고 넓어짐**, mouseup 이후 이동 무시 |
 
 ---
 
@@ -70,6 +71,17 @@ Testing Library로 컴포넌트를 렌더링/조작한다.
    `dist/*.test.js`를 Vitest 기본 설정이 `src/*.test.ts`와 함께 주워 담아 모든
    테스트가 두 번씩 실행되고 있었음 → `vitest.config.ts`에서 `src/**/*.test.ts`만
    포함하도록 명시.
+6. **C열/D열 사이 크기 조정이 전혀 동작하지 않음 (client, 사용자 리포트)** — 열
+   너비 조절 핸들(`.xl-col-resize`)은 항상 자기 열의 **오른쪽 경계**에만 그려지는데,
+   C열(가변폭, `flex:1`)은 애초에 핸들을 렌더링하지 않았다. 그 결과 D열의 핸들은
+   D/E 경계만 조절할 뿐, C와 D 사이 경계에는 드래그할 지점 자체가 없었다.
+   → C열에도 핸들을 추가하되, `useColResize`의 `startResize`에 `direction` 파라미터를
+   더해 D열 너비를 반대 방향(오른쪽 드래그 = D 축소)으로 조절하도록 수정.
+7. **채팅창이 위로 스크롤해 읽는 중에도 새 메시지마다 강제로 맨 아래로 끌어내림
+   (client, QA 중 발견)** — `ChatPanel`의 스크롤 effect가 조건 없이 매번
+   `scrollTop = scrollHeight`를 설정해, 과거 메시지를 읽으려 위로 스크롤해도 다른
+   사람이 메시지를 보내는 순간 강제로 바닥으로 끌려 내려갔음 → 이미 바닥 근처
+   (120px 이내)에 있을 때만 자동으로 따라가도록 수정.
 
 ## 알려진 한계 (별도 조치 없이 리포트만)
 

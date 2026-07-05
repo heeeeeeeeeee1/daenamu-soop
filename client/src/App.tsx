@@ -249,7 +249,14 @@ function App() {
                     style={w !== undefined ? { width: w, position: 'relative' } : { position: 'relative' }}
                   >
                     {ltr}
-                    {ltr !== 'C' && (
+                    {ltr === 'C' ? (
+                      // C열은 가변폭이라 자체 너비가 없음 — C/D 경계 핸들은 D열 너비를
+                      // 반대 방향으로 조절해 이 경계를 실제로 드래그할 수 있게 한다.
+                      <div
+                        className="xl-col-resize"
+                        onMouseDown={e => { e.preventDefault(); e.stopPropagation(); startResize('D', e.clientX, -1) }}
+                      />
+                    ) : (
                       <div
                         className="xl-col-resize"
                         onMouseDown={e => { e.preventDefault(); e.stopPropagation(); startResize(colKey, e.clientX) }}
