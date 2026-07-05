@@ -78,6 +78,15 @@ npm run dev        # https://localhost:5173
 
 브라우저에서 `https://localhost:5173` 접속 시 자체서명인증서 경고 → 무시하고 진행
 
+## 테스트
+
+```bash
+cd server && npm test
+cd client && npm test
+```
+
+테스트 시나리오와 실행 방법은 [TESTING.md](TESTING.md) 참고.
+
 ---
 
 ## 배포
