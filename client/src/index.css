@@ -505,11 +505,6 @@ html, body, #root {
 .xl-empty { color: #bbb; font-size: 11px; font-style: italic; justify-content: center; }
 
 /* ── 리본 추가 버튼 스타일 ── */
-.xl-rtab-file {
-  background: var(--xl-green-dk) !important;
-  color: #fff !important;
-  border-radius: 0;
-}
 .xl-rbtn-icon {
   display: flex;
   flex-direction: column;
