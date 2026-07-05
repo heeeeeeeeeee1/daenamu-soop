@@ -717,7 +717,7 @@ function App() {
               <div className="xl-modal-content">
                 <p className="xl-modal-title">업무 관련 중요 공지</p>
                 <p>이 문서는 <strong>대나무숲</strong>입니다.</p>
-                <p>회사에서 하고 싶은 말을 수식 입력줄에 입력하고 Enter를 누르면,<br/>AI가 <strong>정중한 업무 메시지</strong>로 순화해 드립니다.</p>
+                <p>회사에서 하고 싶은 말을 수식 입력줄에 입력하고 Enter를 누르면,<br/>욕설 강도에 따라 <strong>업무 메시지</strong>로 자동 순화됩니다.</p>
                 <p>욕설 강도에 따라 변환 수위가 달라집니다:</p>
                 <ul>
                   <li>🟢 욕 1~2개 → "일정 확인 부탁드립니다."</li>
