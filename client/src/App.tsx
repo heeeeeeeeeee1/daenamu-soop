@@ -606,7 +606,7 @@ function App() {
       </div>
 
       {/* ── 시트 영역 ── */}
-      <div className="xl-sheet" style={{ fontSize: `${zoom}%` }}>
+      <div className="xl-sheet" style={{ zoom: zoom / 100 }}>
         {activeSheet === 'main' && (
           <div className="xl-colheaders">
             <div className="xl-corner"/>

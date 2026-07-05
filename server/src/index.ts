@@ -32,11 +32,11 @@ io.on('connection', (socket) => {
   socket.data.msgTimestamps = [] as number[]
 
   socket.emit('nickname', nickname)
-  socket.emit('userCount', io.sockets.size)  // 신규 접속자에게 직접 전송
-  io.emit('userCount', io.sockets.size)      // 전체 브로드캐스트
+  socket.emit('userCount', io.sockets.sockets.size)  // 신규 접속자에게 직접 전송
+  io.emit('userCount', io.sockets.sockets.size)      // 전체 브로드캐스트
 
   socket.on('getCount', () => {
-    socket.emit('userCount', io.sockets.size)
+    socket.emit('userCount', io.sockets.sockets.size)
   })
 
   socket.on('shout', ({ text, original, shoutId }: { text: string; original?: string; shoutId?: string }) => {
@@ -63,7 +63,7 @@ io.on('connection', (socket) => {
   })
 
   socket.on('disconnect', () => {
-    io.emit('userCount', io.sockets.size)
+    io.emit('userCount', io.sockets.sockets.size)
   })
 })
 
