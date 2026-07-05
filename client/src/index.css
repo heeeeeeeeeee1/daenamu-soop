@@ -5,19 +5,20 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --xl-green:       #217346;
-  --xl-green-dk:    #185c37;
-  --xl-green-lt:    #e2efda;
-  --xl-green-hi:    #70ad47;
-  --xl-ribbon:      #f3f3f3;
-  --xl-border:      #d0d0d0;
-  --xl-border-dk:   #b0b0b0;
-  --xl-cell:        #ffffff;
-  --xl-hdr:         #f3f3f3;
-  --xl-txt:         #000000;
-  --xl-txt-muted:   #555555;
-  --xl-sel:         #c6efce;
-  --xl-sel-border:  #70ad47;
+  --xl-green:        #217346;
+  --xl-green-dk:     #185c37;
+  --xl-green-lt:     #e2efda;
+  --xl-green-hi:     #70ad47;
+  --xl-titlebar-bg:  #123822;
+  --xl-ribbon:       #f3f3f3;
+  --xl-border:       #d0d0d0;
+  --xl-border-dk:    #b0b0b0;
+  --xl-cell:         #ffffff;
+  --xl-hdr:          #f3f3f3;
+  --xl-txt:          #000000;
+  --xl-txt-muted:    #555555;
+  --xl-sel:          #c6efce;
+  --xl-sel-border:   #70ad47;
 }
 
 html, body, #root {
@@ -42,9 +43,10 @@ html, body, #root {
 /* ── 타이틀바 ── */
 .xl-titlebar {
   height: 30px;
-  background: var(--xl-green);
+  background: var(--xl-titlebar-bg);
   color: #fff;
-  display: flex;
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
   align-items: center;
   flex-shrink: 0;
 }
@@ -53,41 +55,97 @@ html, body, #root {
   align-items: center;
   gap: 6px;
   padding: 0 8px;
-  width: 220px;
+  min-width: 0;
 }
 .xl-app-icon {
-  font-size: 14px;
   cursor: pointer;
   width: 24px; height: 22px;
   border-radius: 2px;
   display: flex; align-items: center; justify-content: center;
 }
 .xl-app-icon:hover { background: rgba(255,255,255,0.25); }
-.xl-qat { display: flex; gap: 2px; }
+.xl-qat { display: flex; align-items: center; gap: 1px; }
 .xl-qat-btn {
-  width: 24px; height: 22px;
+  width: 22px; height: 22px;
   background: transparent;
   border: none;
   color: #fff;
-  font-size: 11px;
   cursor: pointer;
   border-radius: 2px;
   display: flex; align-items: center; justify-content: center;
 }
 .xl-qat-btn:hover { background: rgba(255,255,255,0.25); }
+.xl-qat-more { width: 14px; opacity: 0.75; }
 
+.xl-titlebar-center {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding-left: 4px;
+}
 .xl-title {
-  flex: 1;
-  text-align: center;
   font-size: 11px;
   font-weight: 400;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 280px;
 }
+.xl-autosave {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.12);
+  font-size: 10.5px;
+  color: rgba(255,255,255,0.9);
+}
+.xl-autosave-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--xl-green-hi);
+}
+
+.xl-titlebar-search {
+  justify-self: center;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 220px;
+  height: 20px;
+  padding: 0 10px;
+  border-radius: 4px;
+  background: rgba(255,255,255,0.14);
+  color: rgba(255,255,255,0.75);
+  cursor: text;
+}
+.xl-titlebar-search-icon { flex-shrink: 0; }
+.xl-titlebar-search-text { font-size: 11px; }
 
 .xl-titlebar-right {
   display: flex;
-  width: 140px;
-  justify-content: flex-end;
+  align-items: center;
+  gap: 4px;
+  padding-right: 2px;
 }
+.xl-titlebar-iconbtn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 22px;
+  padding: 0 10px;
+  margin-right: 4px;
+  border: none;
+  border-radius: 4px;
+  background: rgba(255,255,255,0.14);
+  color: #fff;
+  font-size: 11px;
+  cursor: pointer;
+}
+.xl-titlebar-iconbtn:hover { background: rgba(255,255,255,0.25); }
 .xl-winctr {
   width: 46px; height: 30px;
   background: transparent;
@@ -101,43 +159,44 @@ html, body, #root {
 
 /* ── 리본 탭 ── */
 .xl-ribbon-tabs {
-  height: 26px;
-  background: var(--xl-green);
+  height: 28px;
+  background: #fafafa;
+  border-bottom: 1px solid var(--xl-border);
   display: flex;
-  align-items: flex-end;
+  align-items: stretch;
   padding-left: 4px;
   flex-shrink: 0;
 }
 .xl-rtab {
-  height: 22px;
   padding: 0 12px;
   font-size: 11px;
-  color: rgba(255,255,255,0.85);
+  color: #444;
   display: flex; align-items: center;
   cursor: pointer;
-  border-radius: 2px 2px 0 0;
-  transition: background 0.1s;
+  border-bottom: 2px solid transparent;
+  transition: background 0.1s, border-color 0.1s;
 }
-.xl-rtab:hover { background: rgba(255,255,255,0.15); }
+.xl-rtab:hover { background: rgba(0,0,0,0.05); }
 .xl-rtab.active {
-  background: var(--xl-ribbon);
-  color: var(--xl-green);
+  color: var(--xl-green-dk);
   font-weight: 600;
+  border-bottom-color: var(--xl-green);
 }
 .xl-rtab-filler { flex: 1; }
 .xl-sound-btn {
+  align-self: center;
   height: 20px;
-  margin: 0 8px 2px 0;
+  margin: 0 8px 0 0;
   padding: 0 10px;
-  border: 1px solid rgba(255,255,255,0.3);
+  border: 1px solid var(--xl-border-dk);
   border-radius: 2px;
   background: transparent;
-  color: rgba(255,255,255,0.85);
+  color: #444;
   font-size: 11px;
   cursor: pointer;
 }
-.xl-sound-btn:hover { background: rgba(255,255,255,0.15); }
-.xl-sound-btn.on    { background: rgba(255,255,255,0.25); color: #fff; }
+.xl-sound-btn:hover { background: rgba(0,0,0,0.06); }
+.xl-sound-btn.on    { background: var(--xl-green-lt); border-color: var(--xl-green); color: var(--xl-green-dk); }
 
 /* ── 리본 본문 ── */
 .xl-ribbon-body {
@@ -203,6 +262,9 @@ html, body, #root {
   cursor: pointer;
   white-space: nowrap;
   text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 .xl-rbtn:hover { background: #e8e8e8; border-color: var(--xl-border); }
 
@@ -253,6 +315,9 @@ html, body, #root {
   gap: 2px;
 }
 .xl-rbtn-tall:hover { background: #e8e8e8; border-color: var(--xl-border); }
+.xl-rbtn svg, .xl-rbtn-tall svg, .xl-ricobtn svg, .xl-paste-big svg {
+  flex-shrink: 0;
+}
 .xl-delete-btn.active {
   color: #c00;
   background: #fff0f0;
@@ -474,6 +539,37 @@ html, body, #root {
   cursor: pointer;
   padding: 1px 0;
 }
+.xl-chkgrid {
+  display: grid;
+  grid-template-columns: auto auto;
+  column-gap: 12px;
+  row-gap: 2px;
+}
+.xl-chklabel input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 13px; height: 13px;
+  margin: 0;
+  border: 1.3px solid #767676;
+  border-radius: 2px;
+  background: #fff;
+  cursor: pointer;
+  position: relative;
+  flex-shrink: 0;
+}
+.xl-chklabel input[type="checkbox"]:checked {
+  background: var(--xl-green);
+  border-color: var(--xl-green);
+}
+.xl-chklabel input[type="checkbox"]:checked::after {
+  content: '';
+  position: absolute;
+  left: 3.5px; top: 1px;
+  width: 3.5px; height: 7px;
+  border: solid #fff;
+  border-width: 0 1.6px 1.6px 0;
+  transform: rotate(45deg);
+}
 
 /* ── 시트별 추가 스타일 ── */
 .xl-row-stripe { background: #fafafa; }
@@ -674,6 +770,7 @@ html, body, #root {
   border-radius: 2px;
   background: transparent;
   font-size: 11px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
 }
 .xl-viewbtn:hover  { border-color: var(--xl-border); }
 .xl-viewbtn.active { border-color: var(--xl-border-dk); background: #e0e0e0; }

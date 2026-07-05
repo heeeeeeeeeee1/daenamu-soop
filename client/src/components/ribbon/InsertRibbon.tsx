@@ -1,43 +1,46 @@
+import {
+  IconPivotTable, IconBarChart, IconLineChart, IconPieChart,
+  IconPicture, IconShape, IconMap, IconLink, IconTextBox, IconHeaderFooter, IconWordArt,
+} from './icons'
+
 export function InsertRibbon() {
   return <>
     <div className="xl-rgroup">
-      <button className="xl-rbtn-tall" style={{width:52}}>📊<br/><span style={{fontSize:9}}>피벗 테이블</span></button>
-      <button className="xl-rbtn-tall" style={{width:44}}>⊞<br/><span style={{fontSize:9}}>표</span></button>
+      <button className="xl-rbtn-tall" style={{width:52}}><IconPivotTable /><span style={{fontSize:9}}>피벗 테이블</span></button>
+      <button className="xl-rbtn-tall" style={{width:44}}>⊞<span style={{fontSize:9}}>표</span></button>
       <span className="xl-rgroup-label">표</span>
     </div>
     <div className="xl-rsep"/>
     <div className="xl-rgroup">
-      <div className="xl-rfont-row">
-        <button className="xl-rbtn-icon">📈<br/><span style={{fontSize:8}}>세로 막대</span></button>
-        <button className="xl-rbtn-icon">📉<br/><span style={{fontSize:8}}>꺾은 선</span></button>
-        <button className="xl-rbtn-icon">🥧<br/><span style={{fontSize:8}}>원형</span></button>
-        <button className="xl-rbtn-icon">▦<br/><span style={{fontSize:8}}>가로 막대</span></button>
-        <button className="xl-rbtn-icon">⋯<br/><span style={{fontSize:8}}>더보기</span></button>
-      </div>
+      <button className="xl-rbtn-icon"><IconBarChart size={18} /><span style={{fontSize:8}}>세로 막대</span></button>
+      <button className="xl-rbtn-icon"><IconLineChart size={18} /><span style={{fontSize:8}}>꺾은 선</span></button>
+      <button className="xl-rbtn-icon"><IconPieChart size={18} /><span style={{fontSize:8}}>원형</span></button>
+      <button className="xl-rbtn-icon">▦<span style={{fontSize:8}}>가로 막대</span></button>
+      <button className="xl-rbtn-icon">⋯<span style={{fontSize:8}}>더보기</span></button>
       <span className="xl-rgroup-label">차트</span>
     </div>
     <div className="xl-rsep"/>
     <div className="xl-rgroup">
-      <button className="xl-rbtn-tall" style={{width:44}}>🖼️<br/><span style={{fontSize:9}}>그림</span></button>
-      <button className="xl-rbtn-tall" style={{width:44}}>🔷<br/><span style={{fontSize:9}}>도형</span></button>
-      <button className="xl-rbtn-tall" style={{width:44}}>🗺️<br/><span style={{fontSize:9}}>지도</span></button>
+      <button className="xl-rbtn-tall" style={{width:44}}><IconPicture /><span style={{fontSize:9}}>그림</span></button>
+      <button className="xl-rbtn-tall" style={{width:44}}><IconShape /><span style={{fontSize:9}}>도형</span></button>
+      <button className="xl-rbtn-tall" style={{width:44}}><IconMap /><span style={{fontSize:9}}>지도</span></button>
       <span className="xl-rgroup-label">일러스트레이션</span>
     </div>
     <div className="xl-rsep"/>
     <div className="xl-rgroup">
-      <button className="xl-rbtn-tall" style={{width:44}}>🔗<br/><span style={{fontSize:9}}>링크</span></button>
+      <button className="xl-rbtn-tall" style={{width:44}}><IconLink /><span style={{fontSize:9}}>링크</span></button>
       <span className="xl-rgroup-label">링크</span>
     </div>
     <div className="xl-rsep"/>
     <div className="xl-rgroup">
       <div className="xl-rfont-row" style={{gap:2}}>
-        <button className="xl-rbtn">🗒 텍스트 상자</button>
+        <button className="xl-rbtn"><IconTextBox size={12} /> 텍스트 상자</button>
       </div>
       <div className="xl-rfont-row" style={{gap:2}}>
-        <button className="xl-rbtn">📝 머리글/바닥글</button>
+        <button className="xl-rbtn"><IconHeaderFooter size={12} /> 머리글/바닥글</button>
       </div>
       <div className="xl-rfont-row" style={{gap:2}}>
-        <button className="xl-rbtn">✍ WordArt</button>
+        <button className="xl-rbtn"><IconWordArt size={12} /> WordArt</button>
       </div>
       <span className="xl-rgroup-label">텍스트</span>
     </div>

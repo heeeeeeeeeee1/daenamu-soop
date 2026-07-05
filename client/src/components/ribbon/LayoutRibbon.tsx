@@ -1,25 +1,29 @@
+import {
+  IconThemeSlide, IconColorSwatch, IconSparkle, IconRuler, IconOrientation, IconWindow, IconPrinter, IconPicture,
+} from './icons'
+
 export function LayoutRibbon() {
   return <>
     <div className="xl-rgroup">
-      <button className="xl-rbtn-tall" style={{width:52}}>🎨<br/><span style={{fontSize:9}}>테마</span></button>
+      <button className="xl-rbtn-tall" style={{width:52}}><IconThemeSlide size={20} /><span style={{fontSize:9}}>테마</span></button>
       <div className="xl-rgroup-col">
-        <button className="xl-rbtn">🎨 색</button>
-        <button className="xl-rbtn">🔤 글꼴</button>
-        <button className="xl-rbtn">✨ 효과</button>
+        <button className="xl-rbtn"><IconColorSwatch size={12} /> 색</button>
+        <button className="xl-rbtn">Aa 글꼴</button>
+        <button className="xl-rbtn"><IconSparkle size={12} /> 효과</button>
       </div>
       <span className="xl-rgroup-label">테마</span>
     </div>
     <div className="xl-rsep"/>
     <div className="xl-rgroup">
       <div className="xl-rgroup-col">
-        <button className="xl-rbtn">📏 여백</button>
-        <button className="xl-rbtn">📐 용지 방향</button>
-        <button className="xl-rbtn">📄 크기</button>
+        <button className="xl-rbtn"><IconRuler size={12} /> 여백</button>
+        <button className="xl-rbtn"><IconOrientation size={12} /> 용지 방향</button>
+        <button className="xl-rbtn"><IconWindow size={12} /> 크기</button>
       </div>
       <div className="xl-rgroup-col">
-        <button className="xl-rbtn">🖨 인쇄 영역</button>
+        <button className="xl-rbtn"><IconPrinter size={12} /> 인쇄 영역</button>
         <button className="xl-rbtn">↔ 나누기</button>
-        <button className="xl-rbtn">🌄 배경</button>
+        <button className="xl-rbtn"><IconPicture size={12} /> 배경</button>
       </div>
       <span className="xl-rgroup-label">페이지 설정</span>
     </div>

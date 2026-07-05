@@ -9,6 +9,9 @@ import {
   HomeRibbon, InsertRibbon, LayoutRibbon, FormulaRibbon,
   DataRibbon, ReviewRibbon, ViewRibbon,
 } from './components/ribbon'
+import {
+  IconExcelLogo, IconSave, IconUndo, IconRedo, IconChevronDown, IconSearch, IconShare, IconPerson, IconHeaderFooter,
+} from './components/ribbon/icons'
 import { useSocket } from './hooks/useSocket'
 import { useColResize } from './hooks/useColResize'
 import { cellName, getCellText } from './lib/cellHelpers'
@@ -178,15 +181,27 @@ function App() {
             className="xl-app-icon"
             title="온보딩 다시보기"
             onClick={e => { e.stopPropagation(); setShowOnboarding(true) }}
-          >🟢</span>
+          ><IconExcelLogo size={18} /></span>
           <div className="xl-qat">
-            <button className="xl-qat-btn" title="저장">💾</button>
-            <button className="xl-qat-btn" title="실행취소">↩</button>
-            <button className="xl-qat-btn" title="다시실행">↪</button>
+            <button className="xl-qat-btn" title="저장"><IconSave /></button>
+            <button className="xl-qat-btn" title="실행취소"><IconUndo /></button>
+            <button className="xl-qat-btn" title="다시실행"><IconRedo /></button>
+            <button className="xl-qat-btn xl-qat-more" title="빠른 실행 도구 모음 사용자 지정"><IconChevronDown size={9} /></button>
           </div>
         </div>
-        <span className="xl-title">분기별_업무보고_최종.xlsx - Excel</span>
+        <div className="xl-titlebar-center">
+          <span className="xl-title">분기별_업무보고_최종.xlsx - Excel</span>
+          <span className="xl-autosave">
+            <span className="xl-autosave-dot" /> 자동 저장 켬
+          </span>
+        </div>
+        <div className="xl-titlebar-search">
+          <IconSearch size={13} className="xl-titlebar-search-icon" />
+          <span className="xl-titlebar-search-text">검색</span>
+        </div>
         <div className="xl-titlebar-right">
+          <button className="xl-titlebar-iconbtn" title="공유"><IconShare /> 공유</button>
+          <button className="xl-titlebar-iconbtn" title="로그인"><IconPerson /> 로그인</button>
           <button className="xl-winctr" title="최소화">─</button>
           <button className="xl-winctr" title="최대화">□</button>
           <button className="xl-winctr xl-close" title="닫기">✕</button>
@@ -321,7 +336,7 @@ function App() {
           </span>
           <div className="xl-viewbtns">
             <button className="xl-viewbtn active">▦</button>
-            <button className="xl-viewbtn">📄</button>
+            <button className="xl-viewbtn"><IconHeaderFooter size={11} /></button>
           </div>
           <input
             type="range" className="xl-zoom" min={60} max={200} value={zoom}

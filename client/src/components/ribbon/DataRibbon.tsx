@@ -1,4 +1,5 @@
 import type { SortMode } from '../../types'
+import { IconPlug, IconTextBox, IconGlobe, IconSplit, IconNoEntry, IconLink, IconBarChart } from './icons'
 
 interface Props {
   sortMode: SortMode
@@ -10,10 +11,10 @@ interface Props {
 export function DataRibbon({ sortMode, onSort, filterMine, onFilterToggle }: Props) {
   return <>
     <div className="xl-rgroup">
-      <button className="xl-rbtn-tall" style={{width:54}}>🔌<br/><span style={{fontSize:9}}>데이터 가져오기</span></button>
+      <button className="xl-rbtn-tall" style={{width:54}}><IconPlug /><span style={{fontSize:9}}>데이터 가져오기</span></button>
       <div className="xl-rgroup-col">
-        <button className="xl-rbtn">📄 텍스트/CSV</button>
-        <button className="xl-rbtn">🌐 웹</button>
+        <button className="xl-rbtn"><IconTextBox size={12} /> 텍스트/CSV</button>
+        <button className="xl-rbtn"><IconGlobe size={12} /> 웹</button>
         <button className="xl-rbtn">⊞ 표/범위</button>
       </div>
       <span className="xl-rgroup-label">데이터 가져오기</span>
@@ -40,14 +41,14 @@ export function DataRibbon({ sortMode, onSort, filterMine, onFilterToggle }: Pro
     <div className="xl-rsep"/>
     <div className="xl-rgroup">
       <div className="xl-rgroup-col">
-        <button className="xl-rbtn">📐 텍스트 나누기</button>
+        <button className="xl-rbtn"><IconSplit size={12} /> 텍스트 나누기</button>
         <button className="xl-rbtn">⚡ 빠른 채우기</button>
-        <button className="xl-rbtn">🚫 중복 제거</button>
+        <button className="xl-rbtn"><IconNoEntry size={12} /> 중복 제거</button>
       </div>
       <div className="xl-rgroup-col">
-        <button className="xl-rbtn">✅ 데이터 유효성</button>
-        <button className="xl-rbtn">🔗 통합</button>
-        <button className="xl-rbtn">📊 가상 분석</button>
+        <button className="xl-rbtn">✓ 데이터 유효성</button>
+        <button className="xl-rbtn"><IconLink size={12} /> 통합</button>
+        <button className="xl-rbtn"><IconBarChart size={12} /> 가상 분석</button>
       </div>
       <span className="xl-rgroup-label">데이터 도구</span>
     </div>

@@ -1,3 +1,5 @@
+import { IconClipboardPaste, IconScissors, IconCopyDoc, IconBrush, IconPalette, IconTrash } from './icons'
+
 interface Props {
   selectedIds: Set<string>
   deleteSelected: () => void
@@ -7,11 +9,11 @@ interface Props {
 export function HomeRibbon({ selectedIds, deleteSelected, clearAll }: Props) {
   return <>
     <div className="xl-rgroup">
-      <div className="xl-paste-big">📋<span>붙여넣기</span></div>
+      <div className="xl-paste-big"><IconClipboardPaste /><span>붙여넣기</span></div>
       <div className="xl-rgroup-col">
-        <button className="xl-rbtn">✂️ 잘라내기</button>
-        <button className="xl-rbtn">📑 복사</button>
-        <button className="xl-rbtn">🎨 서식 복사</button>
+        <button className="xl-rbtn"><IconScissors /> 잘라내기</button>
+        <button className="xl-rbtn"><IconCopyDoc /> 복사</button>
+        <button className="xl-rbtn"><IconBrush /> 서식 복사</button>
       </div>
       <span className="xl-rgroup-label">클립보드</span>
     </div>
@@ -28,7 +30,7 @@ export function HomeRibbon({ selectedIds, deleteSelected, clearAll }: Props) {
         <button className="xl-ricobtn xl-underline">U</button>
         <div className="xl-rsep-v"/>
         <button className="xl-ricobtn">⊞</button>
-        <button className="xl-ricobtn">🎨</button>
+        <button className="xl-ricobtn"><IconPalette size={13} /></button>
         <button className="xl-ricobtn">A</button>
       </div>
       <span className="xl-rgroup-label">글꼴</span>
@@ -66,12 +68,12 @@ export function HomeRibbon({ selectedIds, deleteSelected, clearAll }: Props) {
         className={`xl-rbtn-tall xl-delete-btn ${selectedIds.size > 0 ? 'active' : ''}`}
         onClick={e => { e.stopPropagation(); deleteSelected() }}
         title="선택한 행 삭제 (Delete)"
-      >🗑 지우기{selectedIds.size > 0 ? ` (${selectedIds.size})` : ''}</button>
+      ><IconTrash size={18} /> 지우기{selectedIds.size > 0 ? ` (${selectedIds.size})` : ''}</button>
       <button
         className="xl-rbtn-tall xl-delete-btn"
         onClick={e => { e.stopPropagation(); clearAll() }}
         title="모든 메시지 삭제 (본인 화면에서만 사라짐)"
-      >🗑️ 전체 삭제</button>
+      ><IconTrash size={18} /> 전체 삭제</button>
       <span className="xl-rgroup-label">편집</span>
     </div>
   </>
