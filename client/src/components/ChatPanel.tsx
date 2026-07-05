@@ -134,7 +134,7 @@ const ChatPanel: React.FC<Props> = ({
 
       {/* 행 1: 헤더 */}
       <div className="xl-row xl-row-header">
-        <div className="xl-rownum xl-rownum-hdr" onClick={e => e.stopPropagation()} />
+        <div className="xl-rownum xl-rownum-hdr" onClick={e => e.stopPropagation()}>1</div>
         {cell(1, 0, '',             { width: colWidths.A }, '날짜')}
         {cell(1, 1, '',             { width: colWidths.B }, '담당자')}
         {cell(1, 2, 'xl-cellflex', undefined,               '업무 내용')}

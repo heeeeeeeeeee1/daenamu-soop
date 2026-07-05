@@ -60,3 +60,35 @@ describe('App - 온보딩 모달 표시/재열람', () => {
     expect(localStorage.getItem('daenamu_visited')).toBe('1')
   })
 })
+
+describe('App - 전체 삭제', () => {
+  beforeEach(() => {
+    localStorage.setItem('daenamu_visited', '1') // 온보딩 건너뛰기
+  })
+
+  it('확인 다이얼로그에서 승인하면 모든 메시지를 지운다', async () => {
+    vi.spyOn(window, 'confirm').mockReturnValue(true)
+    render(<App />)
+
+    const input = screen.getByPlaceholderText('업무 내용을 입력하고 Enter를 누르세요')
+    await userEvent.type(input, '안녕하세요{Enter}')
+    expect(screen.getByText('안녕하세요')).toBeInTheDocument()
+
+    await userEvent.click(screen.getByRole('button', { name: /전체 삭제/ }))
+
+    expect(screen.queryByText('안녕하세요')).not.toBeInTheDocument()
+    expect(screen.getByText('— 데이터 없음 —')).toBeInTheDocument()
+  })
+
+  it('확인 다이얼로그에서 취소하면 메시지가 그대로 남는다', async () => {
+    vi.spyOn(window, 'confirm').mockReturnValue(false)
+    render(<App />)
+
+    const input = screen.getByPlaceholderText('업무 내용을 입력하고 Enter를 누르세요')
+    await userEvent.type(input, '안녕하세요{Enter}')
+
+    await userEvent.click(screen.getByRole('button', { name: /전체 삭제/ }))
+
+    expect(screen.getByText('안녕하세요')).toBeInTheDocument()
+  })
+})

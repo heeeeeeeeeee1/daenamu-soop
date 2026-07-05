@@ -44,6 +44,12 @@ describe('ChatPanel', () => {
     expect(screen.getByText('— 데이터 없음 —')).toBeInTheDocument()
   })
 
+  it('헤더 행의 행 번호 칸에도 "1"이 표시된다 (MonthlySheet/TeamSheet와 동일하게)', () => {
+    const { container } = setup()
+    const headerRownum = container.querySelector('.xl-rownum-hdr')
+    expect(headerRownum).toHaveTextContent('1')
+  })
+
   it('메시지가 없는 빈 행도 헤더와 같은 5개 열(A~E) 구조를 유지하고, 현재 colWidths를 반영한다', () => {
     const customWidths: ColWidths = { A: 70, B: 130, D: 100, E: 65 }
     setup({ messages: [], colWidths: customWidths })

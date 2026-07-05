@@ -1,9 +1,10 @@
 interface Props {
   selectedIds: Set<string>
   deleteSelected: () => void
+  clearAll: () => void
 }
 
-export function HomeRibbon({ selectedIds, deleteSelected }: Props) {
+export function HomeRibbon({ selectedIds, deleteSelected, clearAll }: Props) {
   return <>
     <div className="xl-rgroup">
       <div className="xl-paste-big">📋<span>붙여넣기</span></div>
@@ -66,6 +67,11 @@ export function HomeRibbon({ selectedIds, deleteSelected }: Props) {
         onClick={e => { e.stopPropagation(); deleteSelected() }}
         title="선택한 행 삭제 (Delete)"
       >🗑 지우기{selectedIds.size > 0 ? ` (${selectedIds.size})` : ''}</button>
+      <button
+        className="xl-rbtn-tall xl-delete-btn"
+        onClick={e => { e.stopPropagation(); clearAll() }}
+        title="모든 메시지 삭제 (본인 화면에서만 사라짐)"
+      >🗑️ 전체 삭제</button>
       <span className="xl-rgroup-label">편집</span>
     </div>
   </>

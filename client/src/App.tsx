@@ -133,6 +133,13 @@ function App() {
     setSelectedIds(new Set())
   }, [selectedIds, setMessages])
 
+  const clearAll = useCallback(() => {
+    if (!window.confirm('모든 메시지를 삭제할까요? (본인 화면에서만 사라지며 되돌릴 수 없습니다)')) return
+    setMessages([])
+    setSelectedIds(new Set())
+    setActiveCell(null)
+  }, [setMessages])
+
   const switchSheet = useCallback((s: Sheet) => {
     setActiveSheet(s)
     setActiveCell(null)
@@ -209,7 +216,7 @@ function App() {
 
       {/* 리본 본문 */}
       <div className="xl-ribbon-body">
-        {activeTab === 'home'    && <HomeRibbon selectedIds={selectedIds} deleteSelected={deleteSelected} />}
+        {activeTab === 'home'    && <HomeRibbon selectedIds={selectedIds} deleteSelected={deleteSelected} clearAll={clearAll} />}
         {activeTab === 'insert'  && <InsertRibbon />}
         {activeTab === 'layout'  && <LayoutRibbon />}
         {activeTab === 'formula' && <FormulaRibbon />}
