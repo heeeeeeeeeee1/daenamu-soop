@@ -203,8 +203,8 @@ function App() {
         <button
           className={`xl-sound-btn ${soundOn ? 'on' : ''}`}
           onClick={e => { e.stopPropagation(); handleSoundToggle() }}
-          title={soundOn ? '알림음 끄기' : '알림음 켜기'}
-        >🔔 알림음</button>
+          title={soundOn ? '효과음 끄기' : '효과음 켜기'}
+        >🔔 효과음</button>
       </div>
 
       {/* 리본 본문 */}

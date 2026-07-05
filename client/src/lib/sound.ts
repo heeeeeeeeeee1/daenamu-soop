@@ -43,7 +43,7 @@ function createWind(): void {
 
 export function setWindVolume(on: boolean): void {
   if (!windGainNode || !audioCtx) return
-  windGainNode.gain.setTargetAtTime(on ? 0.04 : 0, audioCtx.currentTime, 0.8)
+  windGainNode.gain.setTargetAtTime(on ? 0.11 : 0, audioCtx.currentTime, 0.8)
 }
 
 export function playShout(intensity: number = 1): void {
@@ -52,16 +52,30 @@ export function playShout(intensity: number = 1): void {
   const now = audioCtx.currentTime
   const duration = 1.2
 
-  // 메아리 tone sweep
+  // 메아리 tone: 딜레이+피드백 루프로 실제 산울림처럼 여러 번 반복되며 감쇠시킨다
   const osc = audioCtx.createOscillator()
   const oscGain = audioCtx.createGain()
   osc.type = 'sine'
   osc.frequency.setValueAtTime(300 + intensity * 100, now)
   osc.frequency.exponentialRampToValueAtTime(80, now + duration)
-  oscGain.gain.setValueAtTime(0.15, now)
+  oscGain.gain.setValueAtTime(0.09, now)
   oscGain.gain.exponentialRampToValueAtTime(0.001, now + duration)
+
+  const echoDelay = audioCtx.createDelay(1)
+  echoDelay.delayTime.value = 0.16
+  const echoFeedback = audioCtx.createGain()
+  echoFeedback.gain.value = 0.45 // 반복될 때마다 감쇠되는 비율
+  const echoWet = audioCtx.createGain()
+  echoWet.gain.value = 0.6
+
   osc.connect(oscGain)
-  oscGain.connect(audioCtx.destination)
+  oscGain.connect(audioCtx.destination) // 원음
+  oscGain.connect(echoDelay)
+  echoDelay.connect(echoFeedback)
+  echoFeedback.connect(echoDelay)       // 피드백 루프 = 반복되는 메아리
+  echoDelay.connect(echoWet)
+  echoWet.connect(audioCtx.destination)
+
   osc.start(now)
   osc.stop(now + duration)
 
@@ -78,7 +92,7 @@ export function playShout(intensity: number = 1): void {
   swFilter.frequency.value = 1200
 
   const swGain = audioCtx.createGain()
-  swGain.gain.setValueAtTime(0.08 * Math.min(intensity, 3), now)
+  swGain.gain.setValueAtTime(0.045 * Math.min(intensity, 3), now)
   swGain.gain.exponentialRampToValueAtTime(0.001, now + 0.4)
 
   swSrc.connect(swFilter)
