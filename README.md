@@ -160,6 +160,13 @@ daenamu-soop/
 
 ---
 
+## 버그 제보 / 의견
+
+발견한 문제나 개선 아이디어는 [GitHub Issues](https://github.com/heeeeeeeeeee1/daenamu-soop/issues)에
+남겨주세요. 앱 내 온보딩 화면(타이틀바 🟢 클릭 시 재열람)에도 같은 링크가 있습니다.
+
+---
+
 ## 바이브코딩
 
 이 프로젝트는 100% 바이브코딩으로 만들어졌습니다.

@@ -27,6 +27,12 @@ export function OnboardingModal({ onDismiss }: Props) {
           </div>
         </div>
         <div className="xl-modal-footer">
+          <a
+            className="xl-modal-link"
+            href="https://github.com/heeeeeeeeeee1/daenamu-soop/issues"
+            target="_blank"
+            rel="noopener noreferrer"
+          >🐛 버그 제보 / 의견 남기기</a>
           <button className="xl-modal-btn" onClick={onDismiss}>확인</button>
         </div>
       </div>

@@ -39,4 +39,12 @@ describe('OnboardingModal', () => {
     await userEvent.click(screen.getByRole('button', { name: '✕' }))
     expect(onDismiss).toHaveBeenCalledTimes(1)
   })
+
+  it('버그 제보 링크가 GitHub 이슈 페이지를 새 탭으로 연다', () => {
+    render(<OnboardingModal onDismiss={vi.fn()} />)
+    const link = screen.getByRole('link', { name: /버그 제보/ })
+    expect(link).toHaveAttribute('href', 'https://github.com/heeeeeeeeeee1/daenamu-soop/issues')
+    expect(link).toHaveAttribute('target', '_blank')
+    expect(link).toHaveAttribute('rel', 'noopener noreferrer')
+  })
 })
