@@ -22,6 +22,18 @@ describe('curseLevel', () => {
   it('빈 문자열은 0을 반환한다', () => {
     expect(curseLevel('')).toBe(0)
   })
+
+  it('열받다/킹받다/빡치다는 욕설이 아닌 감정 표현이라 감지하지 않는다', () => {
+    expect(curseLevel('열받는다')).toBe(0)
+    expect(curseLevel('킹받는다')).toBe(0)
+    expect(curseLevel('빡친다')).toBe(0)
+    expect(curseLevel('빡치네')).toBe(0)
+  })
+
+  it('"시바"/"싯바" 같은 씨발 계열 변형도 감지한다', () => {
+    expect(curseLevel('아 시바나 진짜')).toBeGreaterThan(0)
+    expect(curseLevel('싯바 뭐야')).toBeGreaterThan(0)
+  })
 })
 
 describe('transform', () => {
