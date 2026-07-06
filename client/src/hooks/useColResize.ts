@@ -13,10 +13,14 @@ export function useColResize() {
     document.body.style.userSelect = 'none'
 
     const onMove = (e: MouseEvent) => {
-      if (!resizeRef.current) return
-      const delta = (e.clientX - resizeRef.current.startX) * resizeRef.current.direction
-      const newW  = Math.max(40, resizeRef.current.startW + delta)
-      setColWidths(prev => ({ ...prev, [resizeRef.current!.col]: newW }))
+      const current = resizeRef.current
+      if (!current) return
+      // current를 지역 변수로 캡처해서 setColWidths 업데이터 함수 안에서 사용한다.
+      // resizeRef.current를 업데이터 안에서 다시 읽으면, React가 이 업데이트를
+      // 지연 실행하는 사이 mouseup으로 resizeRef.current가 null이 되어 있을 수 있다.
+      const delta = (e.clientX - current.startX) * current.direction
+      const newW  = Math.max(40, current.startW + delta)
+      setColWidths(prev => ({ ...prev, [current.col]: newW }))
     }
     const onUp = () => {
       resizeRef.current = null

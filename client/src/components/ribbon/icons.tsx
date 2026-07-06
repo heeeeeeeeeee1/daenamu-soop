@@ -374,3 +374,10 @@ export const IconShare: React.FC<IconProps> = ({ size = 13, className }) => (
     <path d="M6.3 8.8 13 5.3M6.3 11.2l6.7 3.5" />
   </svg>
 )
+
+export const IconFlag: React.FC<IconProps> = ({ size = 12, className }) => (
+  <svg width={size} height={size} {...svgBase} className={className} aria-hidden="true">
+    <path d="M5 2v16" />
+    <path d="M5 3h9.5l-2.5 3 2.5 3H5z" />
+  </svg>
+)

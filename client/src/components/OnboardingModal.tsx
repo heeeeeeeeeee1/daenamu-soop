@@ -23,6 +23,7 @@ export function OnboardingModal({ onDismiss }: Props) {
               <li>🔴 욕 6개↑ → "크로스펑셔널 협업 강화 방안을..."</li>
             </ul>
             <p className="xl-modal-tip">💡 같은 서버에 접속한 사람들과 실시간으로 공유됩니다.<br/>원문은 <strong>* 마스킹</strong> 처리되며, 클릭하면 볼 수 있습니다.</p>
+            <p className="xl-modal-tip">🚩 각 행 맨 오른쪽의 <strong>신고</strong> 버튼으로 부적절한 메시지를 운영자에게 바로 신고할 수 있습니다.</p>
             <p className="xl-modal-sub">옆자리 팀장이 봐도 그냥 엑셀입니다. 아마도.</p>
           </div>
         </div>

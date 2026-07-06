@@ -154,6 +154,85 @@ describe('daenamu-soop 서버 통합 테스트', () => {
   })
 })
 
+describe('daenamu-soop 서버 - 신고(report) 기능', () => {
+  let baseUrl: string
+  let closeApp: () => Promise<void>
+  const clients: ClientSocket[] = []
+  let fetchCalls: Array<{ url: string; body: Record<string, unknown> }>
+
+  function connectClient(): ClientSocket {
+    const socket = ioClient(baseUrl, { transports: ['websocket'], forceNew: true })
+    clients.push(socket)
+    return socket
+  }
+
+  beforeAll(async () => {
+    fetchCalls = []
+    const started = await startApp({
+      reportLimit: 2,
+      reportWindowMs: 500,
+      reportWebhookUrl: 'https://example.com/webhook',
+      fetchImpl: async (url, init) => {
+        fetchCalls.push({ url, body: JSON.parse(init.body) })
+        return {}
+      },
+    })
+    baseUrl = started.baseUrl
+    closeApp = started.close
+  })
+
+  afterEach(() => {
+    while (clients.length) clients.pop()?.disconnect()
+    fetchCalls = []
+  })
+
+  afterAll(async () => {
+    await closeApp()
+  })
+
+  it('유효한 신고를 받으면 웹훅으로 신고 내용을 전송하고 reportAck을 응답한다', async () => {
+    const socket = connectClient()
+    await waitFor(socket, 'nickname')
+
+    const ack = waitFor(socket, 'reportAck')
+    socket.emit('report', { messageId: 'm1', nickname: '성난다람쥐', text: '변환된 문구', original: '원문' })
+    await ack
+
+    expect(fetchCalls).toHaveLength(1)
+    expect(fetchCalls[0].url).toBe('https://example.com/webhook')
+    const embed = (fetchCalls[0].body.embeds as Array<Record<string, unknown>>)[0]
+    const fields = embed.fields as Array<{ name: string; value: string }>
+    expect(fields.find(f => f.name === '작성자')?.value).toBe('성난다람쥐')
+    expect(fields.find(f => f.name === '변환된 문구')?.value).toBe('변환된 문구')
+    expect(fields.find(f => f.name === '원문')?.value).toBe('원문')
+  })
+
+  it('messageId나 text가 없으면 무시하고 웹훅을 호출하지 않는다', async () => {
+    const socket = connectClient()
+    await waitFor(socket, 'nickname')
+
+    let ackReceived = false
+    socket.once('reportAck', () => { ackReceived = true })
+    socket.emit('report', { nickname: '성난다람쥐' })
+
+    await new Promise(r => setTimeout(r, 200))
+    expect(fetchCalls).toHaveLength(0)
+    expect(ackReceived).toBe(false)
+  })
+
+  it('rate limit(2개/0.5초)를 초과하는 신고는 무시된다', async () => {
+    const socket = connectClient()
+    await waitFor(socket, 'nickname')
+
+    for (let i = 0; i < 4; i++) {
+      socket.emit('report', { messageId: `m${i}`, text: `문구${i}` })
+    }
+
+    await new Promise(r => setTimeout(r, 300))
+    expect(fetchCalls).toHaveLength(2)
+  })
+})
+
 describe('daenamu-soop 서버 - IP당 동시 연결 제한', () => {
   let baseUrl: string
   let closeApp: () => Promise<void>

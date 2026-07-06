@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import ShoutInput from './components/ShoutInput'
-import ChatPanel from './components/ChatPanel'
+import ChatPanel, { type ChatMessage } from './components/ChatPanel'
 import MonthlySheet from './components/MonthlySheet'
 import TeamSheet from './components/TeamSheet'
 import { OnboardingModal } from './components/OnboardingModal'
@@ -111,6 +111,15 @@ function App() {
     const tier = intensity === 0 ? 'clean' : intensity <= 2 ? 'mild' : intensity <= 5 ? 'spicy' : 'nuclear'
     window.gtag?.('event', 'shout', { curse_tier: tier, curse_count: intensity })
   }, [myNickname, soundOn, setMessages])
+
+  const handleReport = useCallback((msg: ChatMessage) => {
+    socket.emit('report', {
+      messageId: msg.id,
+      nickname: msg.nickname,
+      text: msg.text,
+      original: msg.original,
+    })
+  }, [])
 
   const handleSoundToggle = useCallback(() => {
     if (!soundOn) { initSound(); setWindVolume(true) } else { setWindVolume(false) }
@@ -287,6 +296,9 @@ function App() {
                   </div>
                 )
               })}
+              {/* ChatPanel 행에 있는 신고 전용 열(.xl-actioncol)과 같은 폭이어야
+                  C열 flex 비율이 맞아서 D/E 경계선이 아래 행들과 정렬된다. */}
+              <div className="xl-colhdr xl-colhdr-spacer">F</div>
             </div>
           )}
           {activeSheet === 'main' && (
@@ -299,6 +311,7 @@ function App() {
               activeCell={activeCell}
               onCellClick={handleCellClick}
               colWidths={colWidths}
+              onReport={handleReport}
             />
           )}
           {activeSheet === 'monthly' && <MonthlySheet messages={messages} today={TODAY} />}

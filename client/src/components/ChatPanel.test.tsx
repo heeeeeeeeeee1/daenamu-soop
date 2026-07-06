@@ -14,6 +14,7 @@ const baseMsgs: ChatMessage[] = [
 function setup(overrides: Partial<React.ComponentProps<typeof ChatPanel>> = {}) {
   const onToggleSelect = vi.fn()
   const onCellClick = vi.fn()
+  const onReport = vi.fn()
   const props = {
     messages: baseMsgs,
     myNickname: '성난다람쥐',
@@ -23,10 +24,11 @@ function setup(overrides: Partial<React.ComponentProps<typeof ChatPanel>> = {}) 
     activeCell: null,
     onCellClick,
     colWidths,
+    onReport,
     ...overrides,
   }
   const utils = render(<ChatPanel {...props} />)
-  return { ...utils, onToggleSelect, onCellClick }
+  return { ...utils, onToggleSelect, onCellClick, onReport }
 }
 
 describe('ChatPanel', () => {
@@ -117,6 +119,26 @@ describe('ChatPanel', () => {
     expect(onCellClick).toHaveBeenCalledWith(3, 2)
   })
 
+  it('신고 버튼 클릭 시 onReport가 해당 메시지로 호출되고, 이후 신고 완료 상태로 바뀐다', async () => {
+    const { onReport } = setup()
+    const [reportBtn] = screen.getAllByTitle('부적절한 메시지를 운영자에게 신고합니다')
+    await userEvent.click(reportBtn)
+
+    expect(onReport).toHaveBeenCalledWith(baseMsgs[0])
+    expect(screen.getByTitle('신고가 접수됐습니다')).toBeInTheDocument()
+  })
+
+  it('한 행을 신고해도 다른 행의 신고 버튼은 그대로 남아있다', async () => {
+    const { onReport } = setup()
+    const reportButtons = screen.getAllByTitle('부적절한 메시지를 운영자에게 신고합니다')
+    expect(reportButtons).toHaveLength(2)
+
+    await userEvent.click(reportButtons[0])
+    expect(onReport).toHaveBeenCalledTimes(1)
+    expect(screen.getAllByTitle('부적절한 메시지를 운영자에게 신고합니다')).toHaveLength(1)
+    expect(screen.getByTitle('신고가 접수됐습니다')).toBeInTheDocument()
+  })
+
   it('위로 스크롤해 둔 상태에서 새 메시지가 오면 강제로 맨 아래로 내리지 않는다', () => {
     const { container, rerender } = setup()
     const rowsEl = container.querySelector('.xl-rows') as HTMLDivElement
@@ -133,7 +155,7 @@ describe('ChatPanel', () => {
     rerender(<ChatPanel
       messages={withNewMsg} myNickname="성난다람쥐" today="07/05"
       selectedIds={new Set()} onToggleSelect={vi.fn()} activeCell={null}
-      onCellClick={vi.fn()} colWidths={colWidths}
+      onCellClick={vi.fn()} colWidths={colWidths} onReport={vi.fn()}
     />)
 
     expect(rowsEl.scrollTop).toBe(50) // 그대로 유지되어야 함 (강제 스크롤 없음)
@@ -154,7 +176,7 @@ describe('ChatPanel', () => {
     rerender(<ChatPanel
       messages={withNewMsg} myNickname="성난다람쥐" today="07/05"
       selectedIds={new Set()} onToggleSelect={vi.fn()} activeCell={null}
-      onCellClick={vi.fn()} colWidths={colWidths}
+      onCellClick={vi.fn()} colWidths={colWidths} onReport={vi.fn()}
     />)
 
     expect(rowsEl.scrollTop).toBe(1000) // scrollHeight까지 따라 내려가야 함

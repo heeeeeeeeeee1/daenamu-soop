@@ -47,6 +47,24 @@ describe('useColResize', () => {
     expect(result.current.colWidths.D).toBe(90 + 30)
   })
 
+  it('mousemove 직후 바로 mouseup이 발생해도 에러 없이 처리된다', () => {
+    // setColWidths의 함수형 업데이터는 React가 나중에(flush 시점에) 실행하므로,
+    // mousemove 핸들러 안에서 resizeRef.current를 미리 캡처해두지 않으면
+    // 그 사이 mouseup이 resizeRef.current를 null로 만들어 업데이터 실행 시점에
+    // "Cannot read properties of null" 에러가 날 수 있다.
+    const { result } = renderHook(() => useColResize())
+    act(() => { result.current.startResize('A', 100) })
+
+    expect(() => {
+      act(() => {
+        moveMouse(140)
+        releaseMouse() // 같은 act 블록 안에서 연달아 발생 (지연 실행 상황 재현)
+      })
+    }).not.toThrow()
+
+    expect(result.current.colWidths.A).toBe(56 + 40)
+  })
+
   it('마우스를 뗀 뒤에는 더 이상 이동에 반응하지 않는다', () => {
     const { result } = renderHook(() => useColResize())
     act(() => { result.current.startResize('B', 100) })

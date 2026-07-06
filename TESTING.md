@@ -3,8 +3,8 @@
 ## 실행 방법
 
 ```bash
-cd server && npm test   # 단위 + 통합 테스트 18개
-cd client && npm test   # 단위 + 컴포넌트/통합 테스트 48개
+cd server && npm test   # 단위 + 통합 테스트 21개
+cd client && npm test   # 단위 + 컴포넌트/통합 테스트 60개
 ```
 
 두 패키지 모두 [Vitest](https://vitest.dev)를 사용한다. 클라이언트는 jsdom 환경 +
@@ -37,6 +37,9 @@ Testing Library로 컴포넌트를 렌더링/조작한다.
 | 64자 이하 `shoutId` | 그대로 사용 |
 | rate limit 초과 (설정값 3개/0.5초) | 초과분은 무시 |
 | IP당 동시 연결 제한 초과 (설정값 2개) | 3번째 연결은 즉시 disconnect |
+| 유효한 `report` | 웹훅으로 신고 내용 전송 + `reportAck` 응답 (fetch는 주입한 mock으로 검증) |
+| `messageId`/`text` 없는 `report` | 무시 (웹훅 호출 없음, ack 없음) |
+| 신고 rate limit 초과 (설정값 2개/0.5초) | 초과분은 웹훅 호출 없이 무시 |
 
 ### 클라이언트
 
@@ -46,7 +49,7 @@ Testing Library로 컴포넌트를 렌더링/조작한다.
 | `lib/cellHelpers.test.ts` | 단위 | 셀 이름 변환, 헤더/데이터 행 텍스트, **원문(D열)이 항상 `(비공개)`로만 노출**(마스킹 우회 방지), 범위 밖 인덱스 처리 |
 | `components/OnboardingModal.test.tsx` | 컴포넌트 | 배경/본문 클릭 전파, 확인·닫기 버튼 |
 | `components/ShoutInput.test.tsx` | 컴포넌트 | Enter 제출, 공백 무시, trim, Escape, maxLength |
-| `components/ChatPanel.test.tsx` | 컴포넌트 | 행 렌더링, 원문 마스킹 토글(행별 독립성), 행 선택/Ctrl+선택, activeCell 하이라이트, 셀 클릭 콜백, 스크롤 위치에 따른 자동 스크롤 여부, **빈 상태(데이터 없음) 행의 열 구조/너비가 colWidths를 반영하는지** |
+| `components/ChatPanel.test.tsx` | 컴포넌트 | 행 렌더링, 원문 마스킹 토글(행별 독립성), 행 선택/Ctrl+선택, activeCell 하이라이트, 셀 클릭 콜백, 스크롤 위치에 따른 자동 스크롤 여부, 빈 상태(데이터 없음) 행의 열 구조/너비가 colWidths를 반영하는지, **🚩 신고 버튼 클릭 시 onReport 호출 + 신고 완료 상태 전환(행별 독립성)** |
 | `App.test.tsx` | 통합 (소켓 mock) | 최초 방문 시 온보딩 자동 표시, 이미 방문 시 미표시, 확인 시 닫힘+방문기록 저장, **🟢 아이콘으로 재열람**, 재열람이 방문기록을 건드리지 않음 |
 | `hooks/useColResize.test.ts` | 단위(훅) | 기본 열 너비, 오른쪽 경계 드래그 시 확장, 최소 40px 제한, **C/D 경계 드래그(반대 방향) 시 D열이 좁아지고 넓어짐**, mouseup 이후 이동 무시 |
 

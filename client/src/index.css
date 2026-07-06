@@ -19,6 +19,7 @@
   --xl-txt-muted:    #555555;
   --xl-sel:          #c6efce;
   --xl-sel-border:   #70ad47;
+  --xl-actioncol-w:  56px; /* ChatPanel 신고 열 폭 — 열 헤더 바의 spacer와 반드시 같아야 정렬이 맞음 */
 }
 
 html, body, #root {
@@ -408,6 +409,9 @@ html, body, #root {
   color: var(--xl-txt-muted);
 }
 .xl-colflex { flex: 1; }
+.xl-colhdr-spacer {
+  width: var(--xl-actioncol-w); min-width: var(--xl-actioncol-w);
+}
 
 /* 행 스크롤 컨테이너 */
 .xl-rows {
@@ -430,6 +434,33 @@ html, body, #root {
   border-bottom: 1px solid #e8e8e8;
 }
 .xl-row:hover { background: #f5f5f5; }
+
+/* 신고 버튼 전용 열 — 행 번호 칸과 같은 톤의 "거터"로 취급해 리본 버튼처럼
+   튀는 필(pill) 대신 스프레드시트 여백에 자연스럽게 녹아들게 한다. */
+.xl-actioncol {
+  width: var(--xl-actioncol-w); min-width: var(--xl-actioncol-w);
+  border-left: 1px solid var(--xl-border);
+  background: var(--xl-hdr);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.xl-report-btn {
+  display: flex; align-items: center; justify-content: center;
+  width: 100%; height: 100%;
+  border: none;
+  background: transparent;
+  color: var(--xl-txt-muted);
+  font-size: 10px;
+  cursor: pointer;
+}
+.xl-report-btn:hover { background: #f5d5d5; color: #b00020; }
+.xl-report-done {
+  display: flex; align-items: center; justify-content: center;
+  width: 100%; height: 100%;
+  color: var(--xl-green);
+  font-size: 10px;
+  font-weight: 700;
+}
 .xl-row-header {
   background: var(--xl-green-lt) !important;
   font-weight: 600;

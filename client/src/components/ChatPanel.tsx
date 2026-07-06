@@ -18,6 +18,7 @@ interface Props {
   activeCell: { row: number; col: number } | null
   onCellClick: (row: number, col: number) => void
   colWidths: ColWidths
+  onReport: (msg: ChatMessage) => void
 }
 
 function formatTime(ts: number) {
@@ -43,16 +44,18 @@ interface RowProps {
   msg: ChatMessage
   mine: boolean
   selected: boolean
+  reported: boolean
   rowNum: number
   activeCol: number | null
   today: string
   colWidths: ColWidths
   onToggleSelect: (id: string, multi: boolean) => void
   onCellClick: (row: number, col: number) => void
+  onReport: () => void
 }
 
 const Row: React.FC<RowProps> = React.memo(({
-  msg, mine, selected, rowNum, activeCol, today, colWidths, onToggleSelect, onCellClick,
+  msg, mine, selected, reported, rowNum, activeCol, today, colWidths, onToggleSelect, onCellClick, onReport,
 }) => {
   const cell = (col: number, className: string, style: React.CSSProperties | undefined, content: React.ReactNode) => (
     <div
@@ -93,15 +96,28 @@ const Row: React.FC<RowProps> = React.memo(({
         msg.original ? <MaskedCell text={msg.original} mine={mine} /> : null
       )}
       {cell(4, 'xl-cell-time', { width: colWidths.E }, formatTime(msg.timestamp))}
+
+      <div className="xl-actioncol">
+        {reported ? (
+          <span className="xl-report-btn xl-report-done" title="신고가 접수됐습니다">✓ 신고됨</span>
+        ) : (
+          <button
+            className="xl-report-btn"
+            onClick={e => { e.stopPropagation(); onReport() }}
+            title="부적절한 메시지를 운영자에게 신고합니다"
+          >신고</button>
+        )}
+      </div>
     </div>
   )
 })
 Row.displayName = 'Row'
 
 const ChatPanel: React.FC<Props> = ({
-  messages, myNickname, today, selectedIds, onToggleSelect, activeCell, onCellClick, colWidths,
+  messages, myNickname, today, selectedIds, onToggleSelect, activeCell, onCellClick, colWidths, onReport,
 }) => {
   const rowsRef = useRef<HTMLDivElement>(null)
+  const [reportedIds, setReportedIds] = useState<Set<string>>(new Set())
 
   useEffect(() => {
     const el = rowsRef.current
@@ -140,6 +156,7 @@ const ChatPanel: React.FC<Props> = ({
         {cell(1, 2, 'xl-cellflex', undefined,               '업무 내용')}
         {cell(1, 3, '',             { width: colWidths.D }, '원문 (비고)')}
         {cell(1, 4, '',             { width: colWidths.E }, '시간')}
+        <div className="xl-actioncol">비고</div>
       </div>
 
       {messages.length === 0 && (
@@ -150,6 +167,7 @@ const ChatPanel: React.FC<Props> = ({
           <div className="xl-cell xl-empty xl-cellflex">— 데이터 없음 —</div>
           <div className="xl-cell" style={{ width: colWidths.D }}/>
           <div className="xl-cell" style={{ width: colWidths.E }}/>
+          <div className="xl-actioncol"/>
         </div>
       )}
 
@@ -161,12 +179,17 @@ const ChatPanel: React.FC<Props> = ({
             msg={msg}
             mine={isMine(msg)}
             selected={selectedIds.has(msg.id)}
+            reported={reportedIds.has(msg.id)}
             rowNum={rowNum}
             activeCol={activeCell?.row === rowNum ? activeCell.col : null}
             today={today}
             colWidths={colWidths}
             onToggleSelect={onToggleSelect}
             onCellClick={onCellClick}
+            onReport={() => {
+              onReport(msg)
+              setReportedIds(prev => new Set(prev).add(msg.id))
+            }}
           />
         )
       })}
