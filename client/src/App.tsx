@@ -106,7 +106,9 @@ function App() {
     setActiveCell(null)
 
     if (soundOn) playShout(intensity + 1)
-    socket.emit('shout', { text: transformed, original: raw, shoutId: id })
+    // text는 보내지 않는다 — 서버가 original을 직접 변환해 최종 문구를 결정하고,
+    // 그 결과가 useSocket의 'message' 핸들러를 통해 이 낙관적 로컬 문구를 덮어쓴다.
+    socket.emit('shout', { original: raw, shoutId: id })
 
     const tier = intensity === 0 ? 'clean' : intensity <= 2 ? 'mild' : intensity <= 5 ? 'spicy' : 'nuclear'
     window.gtag?.('event', 'shout', { curse_tier: tier, curse_count: intensity })

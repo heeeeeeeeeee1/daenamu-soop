@@ -4,6 +4,7 @@ import { Server } from 'socket.io'
 import cors from 'cors'
 import helmet from 'helmet'
 import { generateNickname } from './nickname.js'
+import { transform } from './transformDictionary.js'
 
 // 허용 origin: 환경변수(CLIENT_ORIGIN, 콤마 구분)로 오버라이드 가능, 기본값은 배포/로컬 개발 주소
 export const DEFAULT_ORIGINS = [
@@ -14,6 +15,29 @@ export const DEFAULT_ORIGINS = [
 
 export function resolveAllowedOrigins(env: string | undefined = process.env.CLIENT_ORIGIN): string[] {
   return env ? env.split(',').map(o => o.trim()) : DEFAULT_ORIGINS
+}
+
+// Render 등 리버스 프록시 뒤에 배포되면 socket.handshake.address가 프록시 자신의
+// 주소로 잡혀서, IP당 동시 연결 제한이 사실상 "전체 서버 기준"으로 뭉개진다.
+// TRUST_PROXY=1일 때만 X-Forwarded-For를 신뢰하도록 명시적으로 켜야 한다 —
+// 프록시 없는 환경(로컬 등)에서 기본으로 켜두면 클라이언트가 헤더를 조작해
+// 연결 제한/IP 추적을 통째로 우회할 수 있기 때문.
+export function resolveTrustProxy(env: string | undefined = process.env.TRUST_PROXY): boolean {
+  return env === '1' || env === 'true'
+}
+
+export function resolveClientIp(
+  handshake: { address: string; headers: Record<string, string | string[] | undefined> },
+  trustProxy: boolean,
+): string {
+  if (trustProxy) {
+    const header = handshake.headers['x-forwarded-for']
+    const first = Array.isArray(header) ? header[0] : header
+    // X-Forwarded-For: <client>, <proxy1>, <proxy2>, ... — 가장 왼쪽이 원 클라이언트
+    const ip = first?.split(',')[0]?.trim()
+    if (ip) return ip
+  }
+  return handshake.address
 }
 
 export function makeCorsOrigin(allowedOrigins: string[]) {
@@ -39,6 +63,7 @@ export interface AppOptions {
   rateLimit?: number
   rateWindowMs?: number
   maxConnPerIp?: number
+  trustProxy?: boolean
   reportLimit?: number
   reportWindowMs?: number
   reportWebhookUrl?: string
@@ -48,6 +73,7 @@ export interface AppOptions {
 export function createApp(options: AppOptions = {}) {
   const allowedOrigins = options.allowedOrigins ?? resolveAllowedOrigins()
   const corsOrigin     = makeCorsOrigin(allowedOrigins)
+  const trustProxy     = options.trustProxy ?? resolveTrustProxy()
 
   // Rate limit: 소켓당 메시지 타임스탬프 추적
   const RATE_LIMIT      = options.rateLimit ?? 5      // 최대 메시지 수
@@ -86,6 +112,7 @@ export function createApp(options: AppOptions = {}) {
   }
 
   const app = express()
+  app.set('trust proxy', trustProxy)
   app.use(helmet())
   app.use(cors({ origin: corsOrigin }))
 
@@ -107,7 +134,7 @@ export function createApp(options: AppOptions = {}) {
   const connCountByIp = new Map<string, number>()
 
   io.on('connection', (socket) => {
-    const ip = socket.handshake.address
+    const ip = resolveClientIp(socket.handshake, trustProxy)
     const currentCount = connCountByIp.get(ip) ?? 0
     if (currentCount >= MAX_CONN_PER_IP) {
       socket.disconnect(true)
@@ -128,8 +155,14 @@ export function createApp(options: AppOptions = {}) {
       socket.emit('userCount', io.sockets.sockets.size)
     })
 
-    socket.on('shout', ({ text, original, shoutId }: { text: string; original?: string; shoutId?: string }) => {
-      if (typeof text !== 'string' || text.trim().length === 0) return
+    socket.on('shout', ({ text, original, shoutId }: { text?: string; original?: string; shoutId?: string }) => {
+      // 클라이언트가 보낸 text(이미 "변환됐다"고 주장하는 문구)는 신뢰하지 않는다.
+      // 그걸 그대로 믿으면 콘솔에서 socket.emit으로 마스킹 안 된 원문을 그대로
+      // 뿌릴 수 있으므로, 서버가 원문을 대상으로 순화 로직을 직접 재실행해서
+      // 실제로 브로드캐스트할 문구를 스스로 결정한다.
+      const safeOriginal = typeof original === 'string' ? original.trim().slice(0, 300) : undefined
+      const rawInput = safeOriginal || (typeof text === 'string' ? text.trim() : '')
+      if (!rawInput) return
 
       // Rate limiting
       const now = Date.now()
@@ -138,7 +171,7 @@ export function createApp(options: AppOptions = {}) {
       if (recent.length >= RATE_LIMIT) return
       socket.data.msgTimestamps = [...recent, now]
 
-      const safeText = text.trim().slice(0, 300)
+      const safeText = transform(rawInput).slice(0, 300)
       if (!safeText) return
 
       const safeId = typeof shoutId === 'string' && shoutId.length > 0 && shoutId.length <= 64
@@ -149,7 +182,7 @@ export function createApp(options: AppOptions = {}) {
         id:        safeId,
         nickname:  socket.data.nickname as string,
         text:      safeText,
-        original:  typeof original === 'string' ? original.trim().slice(0, 300) : undefined,
+        original:  safeOriginal,
         timestamp: now,
       }
       io.emit('message', msg)

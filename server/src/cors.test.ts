@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { DEFAULT_ORIGINS, resolveAllowedOrigins, makeCorsOrigin } from './app.js'
+import { DEFAULT_ORIGINS, resolveAllowedOrigins, makeCorsOrigin, resolveTrustProxy, resolveClientIp } from './app.js'
 
 describe('resolveAllowedOrigins', () => {
   it('CLIENT_ORIGIN 환경변수가 없으면 기본 origin 목록을 사용한다', () => {
@@ -32,5 +32,38 @@ describe('makeCorsOrigin', () => {
 
   it('origin이 없는 요청(서버-서버, curl 등)은 허용한다', async () => {
     await expect(check(undefined)).resolves.toBe(true)
+  })
+})
+
+describe('resolveTrustProxy', () => {
+  it('TRUST_PROXY 환경변수가 없으면 false다 (기본값 — 프록시 헤더를 신뢰하지 않음)', () => {
+    expect(resolveTrustProxy(undefined)).toBe(false)
+  })
+
+  it("TRUST_PROXY가 '1' 또는 'true'면 true다", () => {
+    expect(resolveTrustProxy('1')).toBe(true)
+    expect(resolveTrustProxy('true')).toBe(true)
+  })
+
+  it('그 외 값은 false다', () => {
+    expect(resolveTrustProxy('yes')).toBe(false)
+    expect(resolveTrustProxy('0')).toBe(false)
+  })
+})
+
+describe('resolveClientIp', () => {
+  it('trustProxy가 false면 X-Forwarded-For를 무시하고 소켓 주소를 그대로 쓴다', () => {
+    const handshake = { address: '10.0.0.5', headers: { 'x-forwarded-for': '1.2.3.4' } }
+    expect(resolveClientIp(handshake, false)).toBe('10.0.0.5')
+  })
+
+  it('trustProxy가 true면 X-Forwarded-For의 첫 번째(원 클라이언트) IP를 쓴다', () => {
+    const handshake = { address: '10.0.0.5', headers: { 'x-forwarded-for': '1.2.3.4, 10.0.0.1' } }
+    expect(resolveClientIp(handshake, true)).toBe('1.2.3.4')
+  })
+
+  it('trustProxy가 true여도 헤더가 없으면 소켓 주소로 폴백한다', () => {
+    const handshake = { address: '10.0.0.5', headers: {} }
+    expect(resolveClientIp(handshake, true)).toBe('10.0.0.5')
   })
 })

@@ -40,6 +40,7 @@
 - **원문 마스킹** — D열(원문)은 `*` 로 표시, 누구든 클릭해서 토글 가능
 - **메시지 삭제** — 행 번호 클릭으로 행 선택 후 Delete 키 / 전체 삭제 버튼
 - **메시지 신고** — 행에 마우스 올리면 나오는 🚩 버튼으로 신고, Discord 웹훅으로 운영자에게 실시간 알림 (신고 내용 외엔 아무것도 저장하지 않음)
+- **서버 측 검증** — 클라이언트가 보낸 "변환된 문구"는 신뢰하지 않고, 서버가 원문을 대상으로 욕설 감지·문장 변환을 직접 재실행한 뒤 브로드캐스트 (콘솔 조작으로 마스킹을 우회할 수 없음)
 
 ### 스프레드시트 기능
 - **셀 클릭 선택** — 파란 테두리 + 열/행 헤더 강조 (진짜 Excel처럼)
@@ -102,6 +103,7 @@ cd client && npm test
 | Instance Type | Free |
 | 환경변수 `CLIENT_ORIGIN` (선택) | 허용할 클라이언트 origin, 콤마로 여러 개 지정 (기본값: Vercel 배포 주소 + localhost:5173) |
 | 환경변수 `REPORT_WEBHOOK_URL` (선택) | 메시지 신고 시 알림받을 Discord 웹훅 URL. 미설정 시 신고 기능은 조용히 무시됨 |
+| 환경변수 `TRUST_PROXY=1` (필수) | Render는 리버스 프록시 뒤에서 실행되므로, 반드시 설정해야 IP당 동시 접속 제한이 접속자별로 정확히 동작함 (미설정 시 모든 접속자가 프록시의 IP 하나로 뭉뚱그려져서 제한에 걸릴 수 있음) |
 
 ### Vercel (클라이언트)
 
@@ -142,14 +144,19 @@ daenamu-soop/
 │   │   │   ├── TeamSheet.tsx     # 팀별목표 시트 (닉네임 직군별 실제 발화 집계, KPI 형태로 위장)
 │   │   │   └── ShoutInput.tsx    # 수식 입력줄 텍스트 입력
 │   │   └── lib/
-│   │       ├── transformDictionary.ts  # 욕설 감지 + 업무 문장 변환
+│   │       ├── transformDictionary.ts  # 욕설 감지 + 업무 문장 변환 (낙관적 로컬 표시용)
 │   │       ├── socket.ts               # Socket.io 클라이언트
 │   │       └── sound.ts                # Web Audio API 효과음
 │   └── vite.config.ts
 └── server/
     └── src/
-        ├── index.ts              # Express + Socket.io 서버
-        └── nickname.ts           # 랜덤 한국어 닉네임 생성
+        ├── index.ts                # 서버 진입점 (app.ts의 createApp 실행)
+        ├── app.ts                  # Express + Socket.io 앱 조합 — CORS, rate limit,
+        │                           # IP당 동시 연결 제한, 신고 웹훅 등 핵심 로직
+        ├── transformDictionary.ts  # 욕설 감지 + 업무 문장 변환 (서버 측 원본).
+        │                           # 클라이언트가 보낸 변환 문구는 신뢰하지 않고,
+        │                           # 서버가 원문(original)으로 직접 재계산해 브로드캐스트함
+        └── nickname.ts             # 랜덤 한국어 닉네임 생성
 ```
 
 ---

@@ -75,7 +75,7 @@ describe('daenamu-soop 서버 통합 테스트', () => {
     expect(count).toBeGreaterThanOrEqual(1)
   })
 
-  it('shout 메시지가 다른 접속자에게 브로드캐스트된다', async () => {
+  it('shout 메시지가 다른 접속자에게 브로드캐스트된다 (text는 서버가 original로부터 직접 계산)', async () => {
     const a = connectClient()
     const b = connectClient()
     await Promise.all([waitFor(a, 'nickname'), waitFor(b, 'nickname')])
@@ -84,11 +84,43 @@ describe('daenamu-soop 서버 통합 테스트', () => {
     a.emit('shout', { text: '테스트 메시지', original: '원본', shoutId: 'abc123' })
     const msg = await received
 
-    expect(msg.text).toBe('테스트 메시지')
+    // original에 욕설이 없으므로 서버가 재계산한 text는 원문 그대로다.
+    // 클라이언트가 보낸 text('테스트 메시지')와는 무관하다는 점이 핵심.
+    expect(msg.text).toBe('원본')
     expect(msg.original).toBe('원본')
     expect(msg.id).toBe('abc123')
     expect(typeof msg.nickname).toBe('string')
     expect(typeof msg.timestamp).toBe('number')
+  })
+
+  it('클라이언트가 보낸 text는 무시하고 서버가 original을 직접 변환한다 (마스킹 우회 방지)', async () => {
+    const socket = connectClient()
+    await waitFor(socket, 'nickname')
+
+    const received = waitFor<{ text: string; original?: string }>(socket, 'message')
+    socket.emit('shout', {
+      text: '조작된 안전한 문구',                      // 클라이언트가 위조한 값 — 서버가 무시해야 함
+      original: '시발 개새끼 병신 존나 미친놈 지랄',      // 실제 원문 (욕설 다수, 3단계)
+    })
+    const msg = await received
+
+    expect(msg.text).not.toBe('조작된 안전한 문구')
+    expect(msg.text).not.toContain('시발')
+    expect(msg.text).not.toContain('개새끼')
+    expect(msg.original).toBe('시발 개새끼 병신 존나 미친놈 지랄')
+  })
+
+  it('original 없이 text만 보내도 text 자체가 욕설 필터링 대상이 된다', async () => {
+    const socket = connectClient()
+    await waitFor(socket, 'nickname')
+
+    const received = waitFor<{ text: string }>(socket, 'message')
+    socket.emit('shout', { text: '이 미친 시발 프로젝트' })
+    const msg = await received
+
+    expect(msg.text).not.toContain('시발')
+    expect(msg.text).not.toContain('미친')
+    expect(msg.text).not.toBe('이 미친 시발 프로젝트')
   })
 
   it('공백만 있는 shout는 무시된다', async () => {
@@ -262,5 +294,49 @@ describe('daenamu-soop 서버 - IP당 동시 연결 제한', () => {
 
     const c3 = connectClient()
     await expect(waitFor(c3, 'disconnect')).resolves.toBeDefined()
+  })
+})
+
+describe('daenamu-soop 서버 - 리버스 프록시 뒤 IP당 동시 연결 제한 (trustProxy)', () => {
+  let baseUrl: string
+  let closeApp: () => Promise<void>
+  const clients: ClientSocket[] = []
+
+  function connectWithForwardedFor(ip: string): ClientSocket {
+    const socket = ioClient(baseUrl, {
+      transports: ['websocket'],
+      forceNew: true,
+      extraHeaders: { 'x-forwarded-for': ip },
+    })
+    clients.push(socket)
+    return socket
+  }
+
+  beforeAll(async () => {
+    const started = await startApp({ maxConnPerIp: 1, trustProxy: true })
+    baseUrl = started.baseUrl
+    closeApp = started.close
+  })
+
+  afterEach(() => {
+    while (clients.length) clients.pop()?.disconnect()
+  })
+
+  afterAll(async () => {
+    await closeApp()
+  })
+
+  it('trustProxy=true면 X-Forwarded-For별로 연결을 따로 세서, 같은 프록시 뒤 서로 다른 사용자가 서로를 끊지 않는다', async () => {
+    const a = connectWithForwardedFor('1.1.1.1')
+    const b = connectWithForwardedFor('2.2.2.2')
+    await expect(Promise.all([waitFor(a, 'nickname'), waitFor(b, 'nickname')])).resolves.toBeDefined()
+  })
+
+  it('trustProxy=true에서 같은 X-Forwarded-For로 제한(1개)을 초과하면 끊긴다', async () => {
+    const a = connectWithForwardedFor('3.3.3.3')
+    await waitFor(a, 'nickname')
+
+    const b = connectWithForwardedFor('3.3.3.3')
+    await expect(waitFor(b, 'disconnect')).resolves.toBeDefined()
   })
 })

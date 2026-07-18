@@ -26,7 +26,16 @@ export function useSocket() {
     socket.on('nickname', (nick: string) => setMyNickname(nick))
     socket.on('userCount', (n: number) => setUserCount(n))
     socket.on('message', (msg: ChatMessage) => {
-      setMessages(prev => prev.some(m => m.id === msg.id) ? prev : [...prev.slice(-200), msg])
+      // 내가 보낸 메시지는 낙관적으로 먼저 화면에 반영되지만, text는 서버가
+      // original을 직접 변환한 값이 최종 결정본이다. id가 이미 있으면 그
+      // 자리에서 서버 값으로 교체해 모든 클라이언트가 같은 문구를 보게 한다.
+      setMessages(prev => {
+        const idx = prev.findIndex(m => m.id === msg.id)
+        if (idx === -1) return [...prev.slice(-200), msg]
+        const next = [...prev]
+        next[idx] = msg
+        return next
+      })
       if (document.hidden) document.title = '🔔 새 메시지 — 대나무숲'
     })
 
